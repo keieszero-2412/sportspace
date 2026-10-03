@@ -14,14 +14,15 @@ import { connectFirestoreEmulator } from "firebase/firestore";
 import { connectStorageEmulator } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBvLJvPwSAZ2IoG0D_FkCTmwrSe6pJ91Zk",
-  authDomain: "sportspace-af6b4.firebaseapp.com",
-  projectId: "sportspace-af6b4",
-  storageBucket: "sportspace-af6b4.firebasestorage.app",
-  messagingSenderId: "490538912999",
-  appId: "1:490538912999:web:ab64a9dd6d9e56f20ea642",
-  measurementId: "G-R1VKP7KP24",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
+
 
 // Initialize Firebase
 const useEmulators =
@@ -29,12 +30,12 @@ const useEmulators =
 const app = initializeApp(
   useEmulators
     ? {
-        ...firebaseConfig,
-        projectId: "demo-sportspace",
-        apiKey: "demo-api-key",
-        authDomain: "demo-sportspace.firebaseapp.com",
-        storageBucket: "demo-sportspace.appspot.com",
-      }
+      ...firebaseConfig,
+      projectId: "demo-sportspace",
+      apiKey: "demo-api-key",
+      authDomain: "demo-sportspace.firebaseapp.com",
+      storageBucket: "demo-sportspace.appspot.com",
+    }
     : firebaseConfig,
 );
 export const auth = getAuth(app);
