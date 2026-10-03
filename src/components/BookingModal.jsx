@@ -41,7 +41,8 @@ export default function BookingModal({
     [busy, setBusy] = useState(false),
     [trackedId, setTrackedId] = useState(null);
   const [clock, setClock] = useState(Date.now()),
-    [file, setFile] = useState(null);
+    [file, setFile] = useState(null),
+    [showPriceList, setShowPriceList] = useState(false);
   const key = useRef(crypto.randomUUID()),
     submitting = useRef(false);
   useEffect(() => {
@@ -70,7 +71,7 @@ export default function BookingModal({
       "Courts",
       [["facility_id", "==", venue.facility_id || venue.id]],
       (v) => {
-        setCourts(v.filter((c) => c.status === "active" || c.is_available === true));
+        setCourts(v.filter((c) => c.status === "active" || c.status === "Đang hoạt động" || c.is_available === true).map(c => ({...c, basePrice: c.basePrice || c.price_day || c.price_night || 100000})));
         a = true;
         loaded();
       },
@@ -135,20 +136,29 @@ export default function BookingModal({
       return [];
     }
   }, [venue.operating_hours, duration]);
-  function cell(c, time) {
-    try {
-      const r = interval(date, time, duration, venue.operating_hours);
-      if (r.startAt <= clock) return "locked";
-      if (
-        availability.some(
-          (a) => a.courtId === c.id && a.expiresAt > clock && overlaps(a, r),
-        )
-      )
-        return "booked";
-      return "available";
-    } catch {
-      return "locked";
+  const slotIntervals = useMemo(() => {
+    const map = {};
+    for (const t of slots) {
+      try {
+        map[t] = interval(date, t, duration, venue.operating_hours);
+      } catch {
+        map[t] = null;
+      }
     }
+    return map;
+  }, [slots, date, duration, venue.operating_hours]);
+
+  function cell(c, time) {
+    const r = slotIntervals[time];
+    if (!r) return "locked";
+    if (r.startAt <= clock) return "locked";
+    if (
+      availability.some(
+        (a) => a.courtId === c.id && a.expiresAt > clock && overlaps(a, r),
+      )
+    )
+      return "booked";
+    return "available";
   }
   const total = useMemo(() => {
     try {
@@ -342,55 +352,130 @@ export default function BookingModal({
               </p>
             )}
             {!loading && !error && courts.length > 0 && (
-              <div style={{ overflowX: "auto", margin: "16px 0", maxWidth: "100%" }}>
-                <table className="court-timetable">
-                  <thead>
-                    <tr>
-                      <th>{tr("Sân con", "Court")}</th>
-                      {slots.map((t) => (
-                        <th key={t}>{t}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {courts.map((c) => (
-                      <tr key={c.id}>
-                        <th>
-                          {c.name}
-                          <small style={{ display: "block" }}>
-                            {Number(c.basePrice || 0).toLocaleString()} VND/h
-                          </small>
-                        </th>
-                        {slots.map((t) => {
-                          const state = cell(c, t),
-                            selected = courtId === c.id && times.includes(t);
-                          return (
-                            <td key={t}>
-                              <button
-                                className={
-                                  "btn " +
-                                  (selected ? "btn-primary" : "btn-outline")
-                                }
-                                disabled={state !== "available" || !c.basePrice}
-                                onClick={() => toggle(c, t)}
-                                style={{ minWidth: 85 }}
-                              >
-                                {selected
-                                  ? tr("Đã chọn", "Selected")
-                                  : state === "available"
-                                    ? tr("Trống", "Free")
-                                    : state === "booked"
-                                      ? tr("Đã giữ", "Held")
-                                      : tr("Khóa", "Locked")}
-                              </button>
-                            </td>
-                          );
-                        })}
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 }}>
+                  <div style={{ display: 'flex', gap: 12, alignItems: 'center', fontSize: '0.85rem' }}>
+                     <span style={{display: 'flex', alignItems: 'center', gap: 4}}>
+                       <div style={{width: 16, height: 16, background: 'transparent', border: '1px solid var(--surface-card-border)', borderRadius: 2}}></div> 
+                       {tr("Trống", "Free")}
+                     </span>
+                     <span style={{display: 'flex', alignItems: 'center', gap: 4}}>
+                       <div style={{width: 16, height: 16, background: 'var(--btn-primary)', borderRadius: 2}}></div> 
+                       {tr("Đang chọn", "Selected")}
+                     </span>
+                     <span style={{display: 'flex', alignItems: 'center', gap: 4}}>
+                       <div style={{width: 16, height: 16, background: '#ef4444', borderRadius: 2}}></div> 
+                       {tr("Đã đặt", "Booked")}
+                     </span>
+                     <span style={{display: 'flex', alignItems: 'center', gap: 4}}>
+                       <div style={{width: 16, height: 16, background: 'var(--bg-secondary)', borderRadius: 2}}></div> 
+                       {tr("Khóa", "Locked")}
+                     </span>
+                  </div>
+                  <button 
+                    className="btn btn-link" 
+                    style={{ padding: 0, textDecoration: 'underline', color: 'var(--btn-primary)', background: 'transparent', border: 'none', cursor: 'pointer' }} 
+                    onClick={() => setShowPriceList(true)}
+                  >
+                    {tr("Xem bảng giá", "View price list")}
+                  </button>
+                </div>
+                <div style={{ overflowX: "auto", margin: "16px 0", maxWidth: "100%" }}>
+                  <table className="court-timetable" style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ padding: 8, minWidth: 80 }}>{tr("Sân", "Court")}</th>
+                        {slots.map((t) => (
+                          <th key={t} style={{ padding: 8, minWidth: 48, fontSize: '0.9rem' }}>{t}</th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {courts.map((c) => (
+                        <tr key={c.id}>
+                          <th style={{ padding: 8, whiteSpace: 'nowrap', fontSize: '0.9rem' }}>
+                            {c.name || c.court_name || "Sân"}
+                          </th>
+                          {slots.map((t) => {
+                            const state = cell(c, t),
+                              selected = courtId === c.id && times.includes(t);
+                            return (
+                              <td key={t} style={{ padding: 4 }}>
+                                <button
+                                  disabled={state !== "available"}
+                                  onClick={() => toggle(c, t)}
+                                  title={state}
+                                  style={{ 
+                                    width: "100%", 
+                                    height: "32px", 
+                                    minWidth: "48px", 
+                                    borderRadius: "4px",
+                                    border: "1px solid",
+                                    borderColor: selected ? "var(--btn-primary)" : state === "available" ? "var(--surface-card-border)" : "transparent",
+                                    cursor: state === "available" ? "pointer" : "not-allowed",
+                                    backgroundColor: selected 
+                                      ? "var(--btn-primary)" 
+                                      : state === "available" 
+                                        ? "transparent" 
+                                        : state === "booked"
+                                          ? "#ef4444"
+                                          : "var(--bg-secondary)",
+                                    opacity: state === "available" || selected || state === "booked" ? 1 : 0.6,
+                                    padding: 0,
+                                    transition: "all 0.2s"
+                                  }}
+                                />
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {showPriceList && (
+                  <div style={{ zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', position: 'fixed', inset: 0 }} onClick={() => setShowPriceList(false)}>
+                    <div className="modal-content" style={{ padding: 24, maxWidth: 450, background: 'var(--bg-primary)', borderRadius: 'var(--radius-lg)' }} onClick={e => e.stopPropagation()}>
+                      <h3 style={{ marginTop: 0, marginBottom: 16 }}>{tr("Bảng giá chi tiết", "Price list details")}</h3>
+                      <div style={{ maxHeight: '60vh', overflowY: 'auto' }}>
+                        {courts.map(c => (
+                          <div key={c.id} style={{ marginBottom: 12, padding: 12, border: '1px solid var(--surface-card-border)', borderRadius: 8 }}>
+                            <strong style={{ display: 'block', marginBottom: 8, color: 'var(--text-primary)' }}>{c.name || c.court_name || "Sân"}</strong>
+                            <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                              {c.price_day && c.price_night ? (
+                                <>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                    <span>{tr("Sáng (Trước 17:00)", "Day (Before 17:00)")}:</span> 
+                                    <span style={{ fontWeight: 'bold' }}>{Number(c.price_day).toLocaleString()} đ/h</span>
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                                    <span>{tr("Tối (Sau 17:00)", "Night (After 17:00)")}:</span> 
+                                    <span style={{ fontWeight: 'bold' }}>{Number(c.price_night).toLocaleString()} đ/h</span>
+                                  </div>
+                                  {c.price_weekend && c.price_weekend !== c.price_night && (
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                      <span>{tr("Cuối tuần", "Weekend")}:</span> 
+                                      <span style={{ fontWeight: 'bold' }}>{Number(c.price_weekend).toLocaleString()} đ/h</span>
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                  <span>{tr("Giá cố định", "Fixed price")}:</span> 
+                                  <span style={{ fontWeight: 'bold' }}>{Number(c.basePrice || c.price_day || 0).toLocaleString()} đ/h</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      <button className="btn btn-primary" style={{ marginTop: 16, width: '100%' }} onClick={() => setShowPriceList(false)}>
+                        {tr("Đóng", "Close")}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
             <p>
               {tr("Tổng thanh toán", "Total payment")}:{" "}

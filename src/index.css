@@ -251,6 +251,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--surface-card-border);
   animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
+  padding: 24px;
 }
 
 @keyframes fadeIn {
