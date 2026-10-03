@@ -303,21 +303,21 @@ export function createService(db, { bucket, auth, now = Date.now } = {}) {
       let cursor = data.cursor ? id(data.cursor) : null;
       let more = true;
       while (found.length < 24 && more) {
-        let q = db.collection("Facilities").orderBy("__name__").limit(60);
+        let q = db.collection("Facilities");
+        if (data.province && data.province !== "ALL") {
+          q = q.where("province", "==", data.province);
+        }
+        if (data.sport && data.sport !== "ALL") {
+          q = q.where("sport", "==", data.sport);
+        }
+        q = q.orderBy("__name__").limit(60);
         if (cursor) q = q.startAfter(cursor);
         const snap = await q.get();
         more = snap.size === 60;
         for (const doc of snap.docs) {
           cursor = doc.id;
           const v = doc.data();
-          if (
-            v.status === "archived" ||
-            (data.province &&
-              data.province !== "ALL" &&
-              v.province !== data.province) ||
-            (data.sport && data.sport !== "ALL" && v.sport !== data.sport)
-          )
-            continue;
+          if (v.status === "archived") continue;
           if (
             data.amenity &&
             data.amenity !== "ALL" &&
