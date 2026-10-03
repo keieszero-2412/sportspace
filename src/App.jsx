@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import HeroSection from "./components/HeroSection";
 import VenueCard from "./components/VenueCard";
+import VenueCardSkeleton from "./components/VenueCardSkeleton";
 import VenueDetailModal from "./components/VenueDetailModal";
 import BookingModal from "./components/BookingModal";
 import MatchmakingSection from "./components/MatchmakingSection";
@@ -606,7 +607,20 @@ export default function App() {
                 </p>
               )}
               {/* Venues Grid */}
-              {displayedVenues.length > 0 ? (
+              {isLoadingVenues && displayedVenues.length === 0 ? (
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns:
+                      "repeat(auto-fill, minmax(min(100%, 280px), 1fr))",
+                    gap: 22,
+                  }}
+                >
+                  {[...Array(8)].map((_, i) => (
+                    <VenueCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : displayedVenues.length > 0 ? (
                 <div
                   style={{
                     display: "grid",
