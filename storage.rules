@@ -1,0 +1,24 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function image() { return request.resource.size <= 5 * 1024 * 1024 && request.resource.contentType.matches('image/(jpeg|png|webp)'); }
+    match /receipts/{uid}/{bookingId}/{file} {
+      function booking() { return firestore.get(/databases/(default)/documents/Bookings/$(bookingId)).data; }
+      allow read: if request.auth != null && (request.auth.uid == uid || request.auth.uid == booking().ownerId);
+      allow create: if resource == null && request.auth != null && request.auth.uid == uid && booking().userId == uid
+        && booking().status == 'held' && request.time.toMillis() < booking().holdExpiresAt && image();
+      allow update, delete: if false;
+    }
+    match /court_photos/{uid}/{file} {
+      allow read: if true;
+      allow create: if resource == null && request.auth != null && request.auth.uid == uid
+        && firestore.get(/databases/(default)/documents/Users/$(uid)).data.role == 'merchant' && image();
+      allow delete: if request.auth != null && request.auth.uid == uid;
+    }
+    match /merchant_documents/{uid}/{file} {
+      allow read: if request.auth != null && (request.auth.uid == uid || request.auth.token.admin == true);
+      allow create: if resource == null && request.auth != null && request.auth.uid == uid && image();
+      allow update, delete: if false;
+    }
+  }
+}

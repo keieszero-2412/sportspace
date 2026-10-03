@@ -1,0 +1,90 @@
+.booking-flow {
+  color: var(--text-primary);
+}
+.modal-content {
+  overflow-wrap: anywhere;
+}
+.booking-flow h2,
+.booking-flow h3 {
+  margin: 12px 0;
+  font-weight: 800;
+}
+.booking-flow p {
+  margin: 12px 0;
+  line-height: 1.6;
+}
+.booking-flow label {
+  display: block;
+  margin: 12px 0;
+  font-weight: 600;
+}
+.booking-flow input:not([type="checkbox"]),
+.booking-flow select,
+.booking-flow textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  margin-top: 6px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+  border: 1px solid var(--surface-card-border);
+  border-radius: 8px;
+}
+.booking-flow .btn {
+  min-width: 90px;
+}
+.form-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0;
+}
+.form-row label {
+  flex: 1 1 180px;
+}
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 18px;
+  margin: 20px 0;
+}
+.feature-card {
+  padding: 20px;
+  border-radius: 14px;
+  overflow-wrap: anywhere;
+}
+.court-timetable {
+  border-collapse: separate;
+  border-spacing: 6px;
+  width: 100%;
+}
+.court-timetable th {
+  padding: 10px;
+  white-space: nowrap;
+}
+.court-timetable button {
+  min-width: 85px;
+}
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--btn-primary);
+  outline-offset: 3px;
+}
+@media (max-width: 480px) {
+  .modal-content {
+    max-width: calc(100vw - 24px);
+    padding: 16px;
+  }
+  .booking-flow .form-row .btn {
+    flex: 1 1 auto;
+  }
+}

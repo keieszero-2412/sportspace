@@ -1,0 +1,464 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   SPORTSPACE DESIGN SYSTEM (BASED ON README.MD SECTION 3)
+   ========================================================================== */
+
+:root {
+  /* LIGHT MODE TOKENS (Transparent Glassmorphism) */
+  --bg-primary: #FFFDF7;
+  --bg-secondary: color-mix(in srgb, #F3F7FA 70%, transparent);
+  --text-primary: #31465A;
+  --text-muted: #5F7489;
+  --surface-card: color-mix(in srgb, #D9F0FF 65%, transparent);
+  --surface-card-hover: color-mix(in srgb, #C5E5FA 80%, transparent);
+  --surface-card-border: color-mix(in srgb, #BCE0F7 40%, transparent);
+  --btn-primary: #89B9E6;
+  --btn-primary-hover: #71A7D8;
+  --btn-primary-text: #0E2841;
+  --highlight: #C7DFA3;
+  --highlight-text: #2D4C13;
+  
+  --accent-orange: #F97316;
+  --accent-red: #EF4444;
+  --accent-green: #22C55E;
+  
+  --shadow-sm: 0 2px 8px rgba(49, 70, 90, 0.06);
+  --shadow-md: 0 8px 24px rgba(49, 70, 90, 0.09);
+  --shadow-lg: 0 16px 36px rgba(49, 70, 90, 0.14);
+  --shadow-glow: 0 0 20px rgba(137, 185, 230, 0.4);
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-full: 9999px;
+
+  --font-main: 'Inter', system-ui, sans-serif;
+  --font-heading: 'Be Vietnam Pro', system-ui, sans-serif;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  /* DARK MODE TOKENS (Transparent Glassmorphism) */
+  --bg-primary: #0C2D45;
+  --bg-secondary: color-mix(in srgb, #081E2F 70%, transparent);
+  --text-primary: #FFF8D2;
+  --text-muted: #B3C9DE;
+  --surface-card: color-mix(in srgb, #3E5BA3 45%, transparent);
+  --surface-card-hover: color-mix(in srgb, #4868B7 65%, transparent);
+  --surface-card-border: color-mix(in srgb, #5275CB 35%, transparent);
+  --btn-primary: #84D175;
+  --btn-primary-hover: #71C361;
+  --btn-primary-text: #07260F;
+  --highlight: #E6FBDA;
+  --highlight-text: #0C2D45;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 24px rgba(132, 209, 117, 0.3);
+}
+
+/* Base resets */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-primary);
+}
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  /* Nền Gradient động (Animated Gradient) tạo cảm giác hiện đại và nổi bật hiệu ứng Glassmorphism */
+  background: linear-gradient(-45deg, #EAF4FC, #F4F9F2, #FFFDF7, #E3F2FD);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  background-attachment: fixed;
+  color: var(--text-primary);
+  line-height: 1.6;
+  transition: color 0.15s ease;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+[data-theme='dark'] body {
+  background: linear-gradient(-45deg, #0A1F30, #0C2D45, #081E2F, #153A58);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
+  background-attachment: fixed;
+}
+
+@keyframes gradientBG {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--surface-card-border);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--btn-primary);
+}
+
+/* Glassmorphism helpers */
+.glass-panel, .venue-card, .modal-content {
+  background: var(--surface-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--surface-card-border);
+}
+[data-theme='dark'] .glass-panel, 
+[data-theme='dark'] .venue-card, 
+[data-theme='dark'] .modal-content {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
+  user-select: none;
+}
+
+.btn-primary {
+  background: var(--btn-primary);
+  color: var(--btn-primary-text);
+  box-shadow: var(--shadow-sm);
+}
+.btn-primary:hover {
+  background: var(--btn-primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: var(--surface-card);
+  color: var(--text-primary);
+  border: 1px solid var(--surface-card-border);
+}
+.btn-secondary:hover {
+  background: var(--surface-card-hover);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--surface-card-border);
+}
+.btn-outline:hover {
+  background: var(--surface-card);
+  border-color: var(--btn-primary);
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+}
+.badge-highlight {
+  background: var(--highlight);
+  color: var(--highlight-text);
+}
+.badge-sport {
+  background: var(--btn-primary);
+  color: var(--btn-primary-text);
+}
+.badge-available {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16A34A;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+[data-theme='dark'] .badge-available {
+  background: rgba(132, 209, 117, 0.2);
+  color: #84D175;
+  border: 1px solid rgba(132, 209, 117, 0.4);
+}
+.badge-booked {
+  background: rgba(239, 68, 68, 0.15);
+  color: #DC2626;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+[data-theme='dark'] .badge-booked {
+  background: rgba(239, 68, 68, 0.25);
+  color: #F87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 45, 69, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 850px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid var(--surface-card-border);
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Layout container */
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ==========================================================================
+   PROJECT RULES STYLES & INTERACTION SYSTEM (PROJECT_RULES.MD)
+   ========================================================================== */
+
+/* 1.1. Layout Shift Prevention for Toggle Text Buttons */
+.toggle-btn-lang {
+  min-width: 84px;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.toggle-btn-theme {
+  min-width: 96px;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.toggle-btn-pricing {
+  min-width: 210px;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.toggle-btn-slot {
+  min-width: 72px;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.toggle-btn-maintenance {
+  min-width: 130px;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.toggle-btn-join {
+  min-width: 140px;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* 1.3. Browser Zoom Safety & Responsive Protection */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+img, canvas, svg {
+  max-width: 100%;
+}
+
+/* 1.4. Double Scrollbar Prevention */
+.modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-content::-webkit-scrollbar-thumb {
+  background: var(--surface-card-border);
+  border-radius: var(--radius-full);
+}
+
+/* 1.5. Micro-interactions: Inputs, Cards, Shadows */
+input, select, textarea, button {
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+::-webkit-datetime-edit,
+::-webkit-datetime-edit-fields-wrapper,
+::-webkit-datetime-edit-text,
+::-webkit-datetime-edit-month-field,
+::-webkit-datetime-edit-day-field,
+::-webkit-datetime-edit-year-field,
+::-webkit-calendar-picker-indicator {
+  font-family: inherit;
+}
+
+[data-theme='dark'] ::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--btn-primary) !important;
+  box-shadow: 0 0 0 3px rgba(137, 185, 230, 0.25) !important;
+}
+
+[data-theme='dark'] input:focus, 
+[data-theme='dark'] select:focus, 
+[data-theme='dark'] textarea:focus {
+  border-color: var(--btn-primary) !important;
+  box-shadow: 0 0 0 3px rgba(132, 209, 117, 0.25) !important;
+}
+
+.glass-panel {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+/* Keyframe animations for Toast & Confirm Modal */
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Pulse animation for live real-time indicator */
+@keyframes pulseGreen {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent-green);
+  border-radius: 50%;
+  animation: pulseGreen 2s infinite;
+}
+
+
+/* Card Hover Micro-interaction */
+.venue-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Base Page Fade In */
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* Base Fade Up */
+.animate-fade-up {
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Button Active scaling (Ripple alternative) */
+.btn:active {
+  transform: scale(0.96);
+}
+
+/* Global Transition helper */
+.smooth-transition {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.google-rating:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.google-rating:active {
+  transform: scale(0.97);
+}
+
+.google-rating:focus-visible {
+  outline: 2px solid #FBBF24;
+  outline-offset: 3px;
+}
+
+.venue-phone {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  min-height: 24px;
+  margin-bottom: 6px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.venue-phone-link {
+  color: var(--text-primary);
+  font-weight: 700;
+  border-radius: 4px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.venue-phone-source { font-weight: 400; text-decoration: underline; }
+.venue-phone-link:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+.venue-phone-link:active { transform: scale(0.97); }
+.venue-phone-link:focus-visible { outline: 2px solid var(--btn-primary); outline-offset: 3px; }
+

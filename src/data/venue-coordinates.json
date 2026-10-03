@@ -1,0 +1,1222 @@
+{
+  "snapshotAt": "2026-10-03T15:06:18.172Z",
+  "reviewedAt": "2026-10-03T15:34:02.293Z",
+  "venues": [
+    {
+      "id": "VN_1783",
+      "name": "Sân bóng đá C1",
+      "address": "1B Y Ngông, Tân tiến, Đắk Lắk",
+      "lat": 12.6727133,
+      "lng": 108.0364007,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+%C4%91%C3%A1+C1/@12.6727133,108.0364007,17z/data=!3m1!4b1!4m6!3m5!1s0x31721d84be78fed1:0x85069d3eb6df5c16!8m2!3d12.6727133!4d108.0364007!16s%2Fg%2F11h6g4r5g2?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng đá C1",
+        "address": "Địa chỉ: 1B Y Ngông, Buôn Ma Thuột, Đắk Lắk, Việt Nam ",
+        "checkedAt": "2026-10-03T15:13:28.359Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1786",
+      "name": "sân cỏ nhân tạo",
+      "address": "M3MH+23F, Tân Lập, Đắk Lắk",
+      "lat": 12.6825671,
+      "lng": 108.0776812,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+c%E1%BB%8F+nh%C3%A2n+t%E1%BA%A1o+Ho%C3%A0ng+Nam/@12.6825671,108.0776812,17z/data=!3m1!4b1!4m6!3m5!1s0x3171f792a711ffd1:0x63553a325878a94e!8m2!3d12.6825671!4d108.0776812!16s%2Fg%2F11swmdhdcb?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân cỏ nhân tạo Hoàng Nam",
+        "address": "Địa chỉ: M3MH+23F, Tân Lập, Đắk Lắk, Việt Nam ",
+        "checkedAt": "2026-10-03T15:14:07.537Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1789",
+      "name": "HĐ Sport",
+      "address": "110 Trần Hưng Đạo, Đắk Lắk",
+      "lat": 12.8021561,
+      "lng": 108.4512288,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+H%C3%B9ng+%C4%90oan+Sport/@12.8021561,108.4512288,17z/data=!3m1!4b1!4m6!3m5!1s0x3171df3ac4e71233:0x975ea0d7fcfad7db!8m2!3d12.8021561!4d108.4512288!16s%2Fg%2F11tckplf8p?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Hùng Đoan Sport",
+        "address": "Địa chỉ: 110 Trần Hưng Đạo, Ea Kar, Đắk Lắk 630000, Việt Nam ",
+        "checkedAt": "2026-10-03T15:23:59.903Z",
+        "precision": "venue"
+      },
+      "reviewNote": "HD Sport expanded to Hung Doan Sport; exact 110 Tran Hung Dao, Ea Kar address matches."
+    },
+    {
+      "id": "VN_1790",
+      "name": "Sân Bóng Đá Mini Cỏ Nhân Tạo Tiến Thy",
+      "address": "JX2W+G22, ĐT682, Hoà Khánh, Đắk Lắk",
+      "lat": 12.6012681,
+      "lng": 107.9950137,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+%C4%90%C3%A1+Mini+C%E1%BB%8F+Nh%C3%A2n+T%E1%BA%A1o+Ti%E1%BA%BFn+Thy/@12.6012681,107.9950137,17z/data=!3m1!4b1!4m6!3m5!1s0x31721ef95e98ad5b:0xc98afcadbecd323c!8m2!3d12.6012681!4d107.9950137!16s%2Fg%2F11q1j4w_1w?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Đá Mini Cỏ Nhân Tạo Tiến Thy",
+        "address": "Địa chỉ: JX2W+G22, ĐT682, Hòa Phú, Đắk Lắk, Việt Nam ",
+        "checkedAt": "2026-10-03T15:14:27.394Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1791",
+      "name": "Sân Vận Động Buôn Ma Thuột",
+      "address": "2 Nguyễn Công Trứ, Tân tiến, Đắk Lắk",
+      "lat": 12.6777897,
+      "lng": 108.0425639,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+V%E1%BA%ADn+%C4%90%E1%BB%99ng+Bu%C3%B4n+Ma+Thu%E1%BB%99t/@12.6777897,108.0425639,17z/data=!3m1!4b1!4m6!3m5!1s0x31721d818ee5b055:0x729cbaf43bedfbda!8m2!3d12.6777897!4d108.0425639!16s%2Fg%2F11g6b31qw9?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Vận Động Buôn Ma Thuột",
+        "address": "Địa chỉ: 2 Nguyễn Công Trứ, Buôn Ma Thuột, Đắk Lắk, Việt Nam ",
+        "checkedAt": "2026-10-03T15:14:36.290Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1792",
+      "name": "Sân bóng chuyển Cù Chính Lan",
+      "address": "14/2 Cù Chính Lan, Tự An, Đắk Lắk",
+      "lat": 12.6684798,
+      "lng": 108.0425371,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+chuy%E1%BB%83n+C%C3%B9+Ch%C3%ADnh+Lan/@12.6684798,108.0425371,17z/data=!3m1!4b1!4m6!3m5!1s0x31721d5c93bada85:0xdcf581cb9d455653!8m2!3d12.6684798!4d108.0425371!16s%2Fg%2F11ng78vf8_?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng chuyển Cù Chính Lan",
+        "address": "Địa chỉ: 14/2 Cù Chính Lan, Buôn Ma Thuột, Đắk Lắk, Việt Nam ",
+        "checkedAt": "2026-10-03T15:14:45.680Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1793",
+      "name": "Sân bóng Hải Nguyên",
+      "address": "87b Hùng Vương TT Eatling , Đắk Nông",
+      "lat": 12.5827194,
+      "lng": 107.894861,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+H%E1%BA%A3i+Nguy%C3%AAn/@12.5827194,107.894861,17z/data=!3m1!4b1!4m6!3m5!1s0x3172193716ceb61d:0x5195acc7cee8bddd!8m2!3d12.5827194!4d107.894861!16s%2Fg%2F11sdnq7nzc?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng Hải Nguyên",
+        "address": "Địa chỉ: 87b Hùng Vương, Cư Jút, Lâm Đồng, Việt Nam ",
+        "checkedAt": "2026-10-03T15:24:13.876Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Venue name and street/locality match; source records current administrative names."
+    },
+    {
+      "id": "VN_1794",
+      "name": "Sân Bóng FIFA",
+      "address": "Thôn Quảng Hợp - Xã Quảng Sơn , Đắk Nông",
+      "lat": 12.1568312,
+      "lng": 107.8716339,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+FIFA/@12.1568312,107.8716339,17z/data=!3m1!4b1!4m6!3m5!1s0x3173d30d2e77d311:0x21082132aefeb06!8m2!3d12.1568312!4d107.8716339!16s%2Fg%2F11mmpdqlgr?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng FIFA",
+        "address": "Địa chỉ: Quảng Sơn, Lâm Đồng, Việt Nam ",
+        "checkedAt": "2026-10-03T15:24:30.147Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Venue name and street/locality match; source records current administrative names."
+    },
+    {
+      "id": "VN_1795",
+      "name": "Sân Bóng Vũ Phong",
+      "address": "72F3+JW6, Bình Hòa 1, Vĩnh Long",
+      "lat": 10.2740476,
+      "lng": 106.0047761,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+V%C5%A9+Phong/@10.2740476,106.0047761,17z/data=!3m1!4b1!4m6!3m5!1s0x310a9d5c04b44797:0x3d380d3c90f4b485!8m2!3d10.2740476!4d106.0047761!16s%2Fg%2F11gj74pshj?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Vũ Phong",
+        "address": "Địa chỉ: 72F3+JW6, Bình Hòa 1, An Bình, Vĩnh Long, Việt Nam ",
+        "checkedAt": "2026-10-03T15:15:16.517Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1800",
+      "name": "Sân bóng mini Quang Huy",
+      "address": "ĐT904, Vĩnh Long",
+      "lat": 10.0450044,
+      "lng": 105.9873028,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+mini+Quang+Huy/@10.0450044,105.9873028,17z/data=!3m1!4b1!4m6!3m5!1s0x31a071b0e3fa023d:0x7ded570db4bed7d9!8m2!3d10.0450044!4d105.9873028!16s%2Fg%2F11hspckj71?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng mini Quang Huy",
+        "address": "Địa chỉ: ĐT904, Tam Bình, Vĩnh Long, Việt Nam ",
+        "checkedAt": "2026-10-03T15:15:56.028Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1802",
+      "name": "Sân bóng Đại Học Xây Dựng Miền Tây",
+      "address": "Đường Phước Hậu, KDC, Vĩnh Long",
+      "lat": 10.2312064,
+      "lng": 105.9600633,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+%C4%90%E1%BA%A1i+H%E1%BB%8Dc+X%C3%A2y+D%E1%BB%B1ng+Mi%E1%BB%81n+T%C3%A2y/@10.2312064,105.9600633,17z/data=!3m1!4b1!4m6!3m5!1s0x310a83bd460fe3f5:0xdabdf9b221a1d80c!8m2!3d10.2312064!4d105.9600633!16s%2Fg%2F11syf3sv0v?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng Đại Học Xây Dựng Miền Tây",
+        "address": "Địa chỉ: Đường Phước Hậu, KDC, Phước Hậu, Vĩnh Long 02703, Việt Nam ",
+        "checkedAt": "2026-10-03T15:16:10.290Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1803",
+      "name": "Sân cỏ nhân tạo Mỹ Ngọc",
+      "address": "QL57, Thanh Đức, Vĩnh Long",
+      "lat": 10.2437577,
+      "lng": 105.994521,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+c%E1%BB%8F+nh%C3%A2n+t%E1%BA%A1o+M%E1%BB%B9+Ng%E1%BB%8Dc/@10.2437577,105.994521,17z/data=!3m1!4b1!4m6!3m5!1s0x310a9d15f06b423f:0xc28d43d836bfd65d!8m2!3d10.2437577!4d105.994521!16s%2Fg%2F11c1p5kpbv?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân cỏ nhân tạo Mỹ Ngọc",
+        "address": "Địa chỉ: QL57, Thanh Đức, Vĩnh Long, Việt Nam ",
+        "checkedAt": "2026-10-03T15:16:19.460Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1807",
+      "name": "Sân Bóng Mini BOA FC",
+      "address": "469F+2GJ, Unnamed Road, Thanh Bình, Vĩnh Long",
+      "lat": 10.1175981,
+      "lng": 106.2237643,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+Mini+BOA+FC/@10.1175981,106.2237643,17z/data=!3m1!4b1!4m6!3m5!1s0x31a00d7c0b0347cf:0x74bf54389c43252a!8m2!3d10.1175981!4d106.2237643!16s%2Fg%2F11h8vdc2b7?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Mini BOA FC",
+        "address": "Địa chỉ: 469F+2GJ, Unnamed, Road, Quới Thiện, Vĩnh Long, Việt Nam ",
+        "checkedAt": "2026-10-03T15:16:50.637Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1808",
+      "name": "Sân vận động huyện Long Hồ",
+      "address": "6X4X+34V, QL53, Phú Đức, Vĩnh Long",
+      "lat": 10.2052474,
+      "lng": 105.997798,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+v%E1%BA%ADn+%C4%91%E1%BB%99ng+Long+H%E1%BB%93/@10.2052474,105.997798,17z/data=!3m1!4b1!4m6!3m5!1s0x31a077c3520373f9:0xd82521cd4c5c7ac5!8m2!3d10.2052474!4d105.997798!16s%2Fg%2F11b67v7pk3?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân vận động Long Hồ",
+        "address": "Địa chỉ: 6X4X+34V, QL53, Long Hồ, Vĩnh Long, Việt Nam ",
+        "checkedAt": "2026-10-03T15:16:59.034Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1809",
+      "name": "Sân Bóng Đá Cỏ Nhân Tạo Anh Căn",
+      "address": "TT. Cầu Ngang, Trà Vinh",
+      "lat": 9.7941974,
+      "lng": 106.4469754,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+%C4%90%C3%A1+C%E1%BB%8F+Nh%C3%A2n+T%E1%BA%A1o+Anh+C%C4%83n/@9.7941974,106.4469754,17z/data=!3m1!4b1!4m6!3m5!1s0x31a0212575641d0b:0x72429e98b59db931!8m2!3d9.7941974!4d106.4469754!16s%2Fg%2F11f6l2vvjf?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Đá Cỏ Nhân Tạo Anh Căn",
+        "address": "Địa chỉ: Cầu Ngang, Vĩnh Long 87806, Việt Nam ",
+        "checkedAt": "2026-10-03T15:17:07.533Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1810",
+      "name": "Sân bóng đá mini Hoa Lý",
+      "address": "W8H6+RW3, Nguyệt Hoá, Trà Vinh",
+      "lat": 9.9295141,
+      "lng": 106.3122977,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+%C4%91%C3%A1+mini+Hoa+L%C3%BD/@9.9295141,106.3122977,17z/data=!3m1!4b1!4m6!3m5!1s0x31a01723f024b68b:0x253c14a0db11e605!8m2!3d9.9295141!4d106.3122977!16s%2Fg%2F11j4cz40xh?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng đá mini Hoa Lý",
+        "address": "Địa chỉ: W8H6+RW3, Nguyệt Hóa, Vĩnh Long, Việt Nam ",
+        "checkedAt": "2026-10-03T15:17:17.763Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue name and street address or exact Plus Code; administrative labels may differ."
+    },
+    {
+      "id": "VN_1812",
+      "name": "Sân Bóng Đá Thanh Binh Sport_Ngũ Lạc H.Duyên Hải Trà Vinh",
+      "address": "MC7M+M3X, TL914, Ngũ Lạc, Trà Vinh",
+      "lat": 9.6642272,
+      "lng": 106.4327439,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+%C4%90%C3%A1+Thanh+Binh+Sport_Ng%C5%A9+L%E1%BA%A1c+H.Duy%C3%AAn+H%E1%BA%A3i+Tr%C3%A0+Vinh/@9.6642272,106.4327439,17z/data=!3m1!4b1!4m6!3m5!1s0x31a02f17337c287d:0xfdf54dc924c8462c!8m2!3d9.6642272!4d106.4327439!16s%2Fg%2F11lf_d6fdf?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Đá Thanh Binh Sport_Ngũ Lạc H.Duyên Hải Trà Vinh",
+        "address": "Địa chỉ: MC7M+M3X, TL914, Duong Lieu, Ngũ Lạc, Vĩnh Long, Việt Nam ",
+        "checkedAt": "2026-10-03T15:17:34.682Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1813",
+      "name": "Sân Bóng Phương Anh",
+      "address": "X6M2+V73, TT. Càng Long, Trà Vinh",
+      "lat": 9.9849465,
+      "lng": 106.2004402,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+Ph%C6%B0%C6%A1ng+Anh/data=!4m7!3m6!1s0x31a013e459f05033:0xf617a462bcaf3ff0!8m2!3d9.9849465!4d106.2004402!16s%2Fg%2F11sttt9nny!19sChIJM1DwWeQToDER8D-vvGKkF_Y?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Sân Bóng Phương Anh",
+        "address": "Sân Bóng Phương Anh\nSân Bóng Phương Anh\n3,5\nSân bóng đá · X6M2+V73\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:17:43.027Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1814",
+      "name": "Sân Bóng Vĩnh Hưng",
+      "address": "204 ĐH7, Đầu Giồng, Trà Vinh",
+      "lat": 9.9396211,
+      "lng": 106.2750183,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+V%C4%A9nh+H%C6%B0ng/@9.9396211,106.2750183,17z/data=!3m1!4b1!4m6!3m5!1s0x31a017c6d3214c43:0x6523ea8918900913!8m2!3d9.9396211!4d106.2750183!16s%2Fg%2F11s7mmk8p0?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Vĩnh Hưng",
+        "address": "Địa chỉ: 204 ĐH7, Đầu Giồng, Bình Phú, Vĩnh Long, Việt Nam ",
+        "checkedAt": "2026-10-03T15:17:48.614Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1815",
+      "name": "Sân bóng đá Phú Cần",
+      "address": "35 QL60, Phú Cần, Trà Vinh",
+      "lat": 9.8283814,
+      "lng": 106.1942376,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+%C4%91%C3%A1+Ph%C3%BA+C%E1%BA%A7n/@9.8283814,106.1942376,17z/data=!3m1!4b1!4m6!3m5!1s0x31a03f068c3ad731:0xdcf276b8a3479136!8m2!3d9.8283814!4d106.1942376!16s%2Fg%2F11r1rnk8np?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng đá Phú Cần",
+        "address": "Địa chỉ: 35 QL60, Tiểu Cần, Vĩnh Long, Việt Nam ",
+        "checkedAt": "2026-10-03T15:17:57.478Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1817",
+      "name": "Sân Bóng Chuyền Thầy Giáo",
+      "address": "169 QL60, Phương Thạnh, Trà Vinh",
+      "lat": 9.9510214,
+      "lng": 106.2647295,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+Chuy%E1%BB%81n+Th%E1%BA%A7y+Gi%C3%A1o/data=!4m7!3m6!1s0x31a011ab6948ef09:0x934a7fb81fc77fa8!8m2!3d9.9510214!4d106.2647295!16s%2Fg%2F11vjkm4tdn!19sChIJCe9IaasRoDERqH_HH7h_SpM?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Sân Bóng Chuyền Thầy Giáo",
+        "address": "Sân Bóng Chuyền Thầy Giáo\nSân Bóng Chuyền Thầy Giáo\n4,5\nSân bóng chuyền · 169 QL60\nMở cả ngày · +84 373 888 712\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:18:11.524Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1819",
+      "name": "Câu lạc bộ bóng đá hậu Giang",
+      "address": "QFF8+39Q, Phường 3, Hậu Giang",
+      "lat": 9.7727152,
+      "lng": 105.4659897,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/C%C3%A2u+l%E1%BA%A1c+b%E1%BB%99+b%C3%B3ng+%C4%91%C3%A1+h%E1%BA%ADu+Giang/@9.7727152,105.4659897,17z/data=!3m1!4b1!4m6!3m5!1s0x31a0e92069886ae5:0xbebcf106aa6b55c9!8m2!3d9.7727152!4d105.4659897!16s%2Fg%2F11gy44rp0d?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Câu lạc bộ bóng đá hậu Giang",
+        "address": "Địa chỉ: QFF8+39Q, Vị Thanh, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:18:23.209Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1820",
+      "name": "Khách Sạn- Nhà Hàng Bông Sen",
+      "address": "60 Trần Hưng Đạo, Phường 5, Hậu Giang",
+      "lat": 9.7943647,
+      "lng": 105.4803701,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Kh%C3%A1ch+S%E1%BA%A1n-+Nh%C3%A0+H%C3%A0ng+B%C3%B4ng+Sen/@9.7943647,105.4803701,17z/data=!4m9!3m8!1s0x31a0e98f28c23bb5:0x5f16fd4969923895!5m2!4m1!1i2!8m2!3d9.7943647!4d105.4803701!16s%2Fg%2F11twgxxm8w?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Khách Sạn- Nhà Hàng Bông Sen",
+        "address": "Địa chỉ: 60 Trần Hưng Đạo, Vị Tân, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:18:32.640Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1822",
+      "name": "Sân bóng đá cỏ nhân tạo Bông Sen",
+      "address": "QFVJ+HGW, Phường 5, Hậu Giang",
+      "lat": 9.7939755,
+      "lng": 105.4813417,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+%C4%91%C3%A1+c%E1%BB%8F+nh%C3%A2n+t%E1%BA%A1o+B%C3%B4ng+Sen/data=!4m7!3m6!1s0x31a0e943b91f6b2d:0xe22e8fc939ea7658!8m2!3d9.7939755!4d105.4813417!16s%2Fg%2F11c76kyqhb!19sChIJLWsfuUPpoDERWHbqOcmPLuI?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Sân bóng đá cỏ nhân tạo Bông Sen",
+        "address": "Sân bóng đá cỏ nhân tạo Bông Sen\nSân bóng đá cỏ nhân tạo Bông Sen\n3,7\nSân bóng đá · QFVJ+HGW\nĐã đóng cửa · Mở cửa lúc 5:00 CN · +84 839 369 595\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:26:01.848Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched named venue and street address or exact Plus Code."
+    },
+    {
+      "id": "VN_1823",
+      "name": "Sân bóng mini Liên đoàn Lao động tỉnh Hậu Giang",
+      "address": "QFXW+R4X, Phường 5, Hậu Giang",
+      "lat": 9.7996229,
+      "lng": 105.4953563,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+mini+Li%C3%AAn+%C4%91o%C3%A0n+Lao+%C4%91%E1%BB%99ng+t%E1%BB%89nh+H%E1%BA%ADu+Giang/@9.7996229,105.4953563,17z/data=!3m1!4b1!4m6!3m5!1s0x31a0e968365cfed3:0xaef8751febcde3c3!8m2!3d9.7996229!4d105.4953563!16s%2Fg%2F11kjppzd5c?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng mini Liên đoàn Lao động tỉnh Hậu Giang",
+        "address": "Địa chỉ: QFXW+R4X, Phường 5, Vị Tân, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:18:53.656Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1824",
+      "name": "Sân Bóng Đá Xã Vị Thanh",
+      "address": "RGVV+RG8, Vị Thanh, Hậu Giang",
+      "lat": 9.8445446,
+      "lng": 105.5438207,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+%C4%90%C3%A1+X%C3%A3+V%E1%BB%8B+Thanh/@9.8445446,105.5438207,17z/data=!3m1!4b1!4m6!3m5!1s0x31a0ed0cbf49ab03:0x2e8f59735dcef50!8m2!3d9.8445446!4d105.5438207!16s%2Fg%2F11pyp7c7ws?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Đá Xã Vị Thanh",
+        "address": "Địa chỉ: RGVV+RG8, Vị Thanh 1, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:19:02.544Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1826",
+      "name": "Sân bóng chuyền Mỏ Ó",
+      "address": "C5GC+MG4, Ấp Mở Ó, Sóc Trăng",
+      "lat": 9.4266388,
+      "lng": 106.1713386,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+chuy%E1%BB%81n+M%E1%BB%8F+%C3%93/data=!4m7!3m6!1s0x31a1c900661419e9:0x754c7f82b66ebe41!8m2!3d9.4266388!4d106.1713386!16s%2Fg%2F11y48sp2gh!19sChIJ6RkUZgDJoTERQb5utoJ_THU?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Sân bóng chuyền Mỏ Ó",
+        "address": "Sân bóng chuyền Mỏ Ó\nSân bóng chuyền Mỏ Ó\n5,0\nSân bóng chuyền · C5GC+MG4\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:19:16.677Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1827",
+      "name": "Sân Banh Quang Thuỷ Sản 503 Phạm Hùng",
+      "address": "503 Phạm Hùng, Phường 8, Sóc Trăng",
+      "lat": 9.6156604,
+      "lng": 106.0063025,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+%C4%91%C3%A1+Quang+Th%E1%BB%A7y+S%E1%BA%A3n/@9.6156604,106.0063025,17z/data=!3m1!4b1!4m6!3m5!1s0x31a04f00428b6c4f:0xa165cc44378eecc7!8m2!3d9.6156604!4d106.0063025!16s%2Fg%2F11lc_zbrt0?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng đá Quang Thủy Sản",
+        "address": "Địa chỉ: 503 Phạm Hùng, Sóc Trăng, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:19:23.106Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1828",
+      "name": "Sân Bóng Đá Mini Hòa Hưng",
+      "address": "8X9M+29V, Lê Lai, TT. Vinh Châu, Sóc Trăng",
+      "lat": 9.3176138,
+      "lng": 105.983423,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+%C4%90%C3%A1+Mini+H%C3%B2a+H%C6%B0ng/@9.3176138,105.983423,17z/data=!3m1!4b1!4m6!3m5!1s0x31a1bada3e85bacf:0x8abbb7b3ff1bc4dd!8m2!3d9.3176138!4d105.983423!16s%2Fg%2F11cs32f7rf?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Đá Mini Hòa Hưng",
+        "address": "Địa chỉ: 8X9M+29V, Lê Lai, Vĩnh Châu, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:19:32.068Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1829",
+      "name": "Sân bóng chuyền Trung Tiger",
+      "address": "QX9M+7HF, Ấp An Thành, Sóc Trăng",
+      "lat": 9.7681804,
+      "lng": 105.9839071,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+chuy%E1%BB%81n+Trung+Tiger/@9.7681804,105.9839071,17z/data=!3m1!4b1!4m6!3m5!1s0x31a045a9ec845a5f:0x847e4fae8a0f1b60!8m2!3d9.7681804!4d105.9839071!16s%2Fg%2F11syzcklzd?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng chuyền Trung Tiger",
+        "address": "Địa chỉ: QX9M+7HF, Ấp An Thành, Kế Sách, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:19:40.534Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1832",
+      "name": "Sân bóng Đại Ngãi",
+      "address": "P3JC+6R5, Đại Ngãi, Sóc Trăng",
+      "lat": 9.7305033,
+      "lng": 106.0721026,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+%C4%90%E1%BA%A1i+Ng%C3%A3i/@9.7305033,106.0721026,17z/data=!3m1!4b1!4m6!3m5!1s0x31a047b33b96122b:0x8829280cde8b0d0b!8m2!3d9.7305033!4d106.0721026!16s%2Fg%2F11ghflyhtg?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng Đại Ngãi",
+        "address": "Địa chỉ: P3JC+6R5, Đại Ngãi, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:20:07.147Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched distinctive venue name and exact street/house number or Plus Code. Current administrative labels retained in source."
+    },
+    {
+      "id": "VN_1834",
+      "name": "Sân Bóng Mini Vũ Hùng - Sáu Gấm",
+      "address": "QX9J+968, Ung Công Uẩn, TT. Kế Sách, Sóc Trăng",
+      "lat": 9.7684208,
+      "lng": 105.9805745,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+Mini+V%C5%A9+H%C3%B9ng+-+S%C3%A1u+G%E1%BA%A5m/@9.7684208,105.9805745,17z/data=!3m1!4b1!4m6!3m5!1s0x31a044b749389819:0x23d5a2e8aca09c9d!8m2!3d9.7684208!4d105.9805745!16s%2Fg%2F11b67r0kvj?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Mini Vũ Hùng - Sáu Gấm",
+        "address": "Địa chỉ: QX9J+968, Ung Công Uẩn, Kế Sách, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:20:21.625Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue identity and street address or Plus Code; source uses current administrative names."
+    },
+    {
+      "id": "VN_1835",
+      "name": "Sân bóng thiên thanh",
+      "address": "139T ấp hoà mỹ, TT. Mỹ Xuyên, Sóc Trăng",
+      "lat": 9.5661004,
+      "lng": 105.981934,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+thi%C3%AAn+thanh/@9.5661004,105.981934,17z/data=!3m1!4b1!4m6!3m5!1s0x31a04d51cef11649:0x2e1270d51b713f51!8m2!3d9.5661004!4d105.981934!16s%2Fg%2F11t6wxn4fw?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng thiên thanh",
+        "address": "Địa chỉ: 139T ấp hoà mỹ, Mỹ Xuyên, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:20:33.020Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue identity and street address or Plus Code; source uses current administrative names."
+    },
+    {
+      "id": "VN_1836",
+      "name": "Sân Bóng Anh Lợi",
+      "address": "Cầu ÔRô, Long Hưng - Mỹ Tú, TT. Huỳnh Hữu Nghĩa, Sóc Trăng",
+      "lat": 9.640007,
+      "lng": 105.8127822,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+Anh+L%E1%BB%A3i/@9.640007,105.8127822,17z/data=!3m1!4b1!4m6!3m5!1s0x31a0570e97fb31b3:0x47df9ab9be8f0f88!8m2!3d9.640007!4d105.8127822!16s%2Fg%2F11fmmvl5xb?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Bóng Anh Lợi",
+        "address": "Địa chỉ: Cầu ÔRô, Long Hưng - Mỹ Tú, Mỹ Tú, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:20:41.676Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue identity and street address or Plus Code; source uses current administrative names."
+    },
+    {
+      "id": "VN_1838",
+      "name": "Sân bóng đá Quang Thủy Sản",
+      "address": "503 Phạm Hùng, Phường 8, Sóc Trăng",
+      "lat": 9.6156604,
+      "lng": 106.0063025,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+%C4%91%C3%A1+Quang+Th%E1%BB%A7y+S%E1%BA%A3n/@9.6156604,106.0063025,17z/data=!3m1!4b1!4m6!3m5!1s0x31a04f00428b6c4f:0xa165cc44378eecc7!8m2!3d9.6156604!4d106.0063025!16s%2Fg%2F11lc_zbrt0?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng đá Quang Thủy Sản",
+        "address": "Địa chỉ: 503 Phạm Hùng, Sóc Trăng, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:20:58.857Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue identity and street address or Plus Code; source uses current administrative names."
+    },
+    {
+      "id": "VN_1839",
+      "name": "Sân cỏ Bãi Giá",
+      "address": "F6X2+2C4, Trung Bình, Sóc Trăng",
+      "lat": 9.4975078,
+      "lng": 106.2010884,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+c%E1%BB%8F+B%C3%A3i+Gi%C3%A1/@9.4975078,106.2010884,17z/data=!3m1!4b1!4m6!3m5!1s0x31a1cb47a3225b2b:0x74742b6527fde963!8m2!3d9.4975078!4d106.2010884!16s%2Fg%2F11ghrb27j1?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân cỏ Bãi Giá",
+        "address": "Địa chỉ: F6X2+2C4, Trần Đề, Cần Thơ, Việt Nam ",
+        "checkedAt": "2026-10-03T15:26:46.603Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched named venue and street address or exact Plus Code."
+    },
+    {
+      "id": "VN_1841",
+      "name": "Hấu COFFE - SÂN BÓNG ĐẠT AN",
+      "address": "KDC LÊ DUẨN, ĐƯỜNG SỐ 6, Phường 3, Sóc Trăng",
+      "lat": 9.594047,
+      "lng": 105.9778732,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/H%E1%BA%A5u+COFFE+-+S%C3%82N+B%C3%93NG+%C4%90%E1%BA%A0T+AN/@9.594047,105.9778732,17z/data=!3m1!4b1!4m6!3m5!1s0x31a04dba40f485ab:0x22f98aa26b56af18!8m2!3d9.594047!4d105.9778732!16s%2Fg%2F11vz4y5ypt?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Hấu COFFE - SÂN BÓNG ĐẠT AN",
+        "address": "Địa chỉ: KDC LÊ DUẨN, ĐƯỜNG SỐ 6, Phú Lợi, Cần Thơ 96000, Việt Nam ",
+        "checkedAt": "2026-10-03T15:21:20.473Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue identity and street address or Plus Code; source uses current administrative names."
+    },
+    {
+      "id": "VN_1843",
+      "name": "Sân Cỏ Nhân Tạo Xã Vĩnh Thanh",
+      "address": "Vĩnh Thanh, Bạc Liêu",
+      "lat": 9.3555516,
+      "lng": 105.5214175,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+C%E1%BB%8F+Nh%C3%A2n+T%E1%BA%A1o+X%C3%A3+V%C4%A9nh+Thanh/@9.3555516,105.5214175,17z/data=!3m1!4b1!4m6!3m5!1s0x31a111c048efe9a9:0x5091e770bc6799d7!8m2!3d9.3555516!4d105.5214175!16s%2Fg%2F11gxrwkfzm?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân Cỏ Nhân Tạo Xã Vĩnh Thanh",
+        "address": "Địa chỉ: Vĩnh Thanh, Cà Mau, Việt Nam ",
+        "checkedAt": "2026-10-03T15:21:35.686Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched venue identity and street address or Plus Code; source uses current administrative names."
+    },
+    {
+      "id": "VN_1844",
+      "name": "Sân bóng chuyền (Minh Thiện)",
+      "address": "Ninh Thạnh Lợi, Bạc Liêu",
+      "lat": 9.4646298,
+      "lng": 105.4073637,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+chuy%E1%BB%81n+(Minh+Thi%E1%BB%87n)/@9.4646298,105.4073637,17z/data=!3m1!4b1!4m6!3m5!1s0x31a119d1a8057f1d:0x2f809be83c396b98!8m2!3d9.4646298!4d105.4073637!16s%2Fg%2F11ld6z62b9?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng chuyền (Minh Thiện)",
+        "address": "Địa chỉ: Ninh Thạnh Lợi, Cà Mau, Việt Nam ",
+        "checkedAt": "2026-10-03T15:27:06.717Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched named venue and street address or exact Plus Code."
+    },
+    {
+      "id": "VN_1848",
+      "name": "Sân bóng cỏ nhân tạo Gia Phú",
+      "address": "CFP7+MJ7, Ấp Nội Ô, Bạc Liêu",
+      "lat": 9.436658,
+      "lng": 105.464032,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+c%E1%BB%8F+nh%C3%A2n+t%E1%BA%A1o+Gia+Ph%C3%BA/@9.436658,105.464032,17z/data=!3m1!4b1!4m6!3m5!1s0x31a1199994ac809f:0x9ac3480fdb84071f!8m2!3d9.436658!4d105.464032!16s%2Fg%2F11q1w5xtst?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng cỏ nhân tạo Gia Phú",
+        "address": "Địa chỉ: CFP7+MJ7, Ấp Nội Ô, Phước Long, Cà Mau, Việt Nam ",
+        "checkedAt": "2026-10-03T15:22:13.631Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Venue name and house/street address or exact Plus Code match the source pin."
+    },
+    {
+      "id": "VN_1849",
+      "name": "Cà phê - Sân bóng Thanh Thư",
+      "address": "Hưng Hội, Bạc Liêu",
+      "lat": 9.3179176,
+      "lng": 105.7685006,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/C%C3%A0+ph%C3%AA+-+S%C3%A2n+b%C3%B3ng+Thanh+Th%C6%B0/@9.3179176,105.7685006,17z/data=!3m1!4b1!4m6!3m5!1s0x31a10900381ef365:0x8dab41c3b2e8e238!8m2!3d9.3179176!4d105.7685006!16s%2Fg%2F11vpqppfqv?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Cà phê - Sân bóng Thanh Thư",
+        "address": "Địa chỉ: Hưng Hội, Cà Mau, Việt Nam ",
+        "checkedAt": "2026-10-03T15:22:26.611Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Venue name and house/street address or exact Plus Code match the source pin."
+    },
+    {
+      "id": "VN_1850",
+      "name": "Sân Bóng Đá - Pickleball Hoà Phát Bạc Liêu",
+      "address": "8P99+5JM, QL1A, TT. Châu Hưng, Bạc Liêu",
+      "lat": 9.317992,
+      "lng": 105.7189022,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+%C4%90%C3%A1+-+Pickleball+Ho%C3%A0+Ph%C3%A1t+B%E1%BA%A1c+Li%C3%AAu/data=!4m7!3m6!1s0x31a1090073f57dd5:0x7b31fb12bc6f643!8m2!3d9.317992!4d105.7189022!16s%2Fg%2F11w8thyx2c!19sChIJ1X31cwAJoTERQ_bGK7Efswc?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Sân Bóng Đá - Pickleball Hoà Phát Bạc Liêu",
+        "address": "Sân Bóng Đá - Pickleball Hoà Phát Bạc Liêu\nSân Bóng Đá - Pickleball Hoà Phát Bạc Liêu\n4,6\nCâu lạc bộ thể thao · 8P99+5JM, QL1A\nMở cả ngày · +84 981 449 494\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:22:35.177Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Venue name and house/street address or exact Plus Code match the source pin."
+    },
+    {
+      "id": "VN_1851",
+      "name": "Sân Bóng Chuyền Trung Tính",
+      "address": "8QGM+X8C Áp Ca Vinh, Hưng Hội, Bạc Liêu",
+      "lat": 9.3274321,
+      "lng": 105.7832521,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+B%C3%B3ng+Chuy%E1%BB%81n+Trung+T%C3%ADnh/data=!4m7!3m6!1s0x31a1a70017a1e343:0xf6f22918c23420e7!8m2!3d9.3274321!4d105.7832521!16s%2Fg%2F11wh69d27r!19sChIJQ-OhFwCnoTER5yA0whgp8vY?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Sân Bóng Chuyền Trung Tính",
+        "address": "Sân Bóng Chuyền Trung Tính\nSân Bóng Chuyền Trung Tính\n5,0\nSân chơi · 8QGM+X8C Áp Ca Vinh\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:22:40.904Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Venue name and house/street address or exact Plus Code match the source pin."
+    },
+    {
+      "id": "VN_1855",
+      "name": "Sân bóng Đào Nguyên Bạc Liêu",
+      "address": "449 QL1A, TT. Châu Hưng, Bạc Liêu",
+      "lat": 9.3140291,
+      "lng": 105.7199204,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+%C4%90%C3%A0o+Nguy%C3%AAn+B%E1%BA%A1c+Li%C3%AAu/@9.3140291,105.7199204,17z/data=!3m1!4b1!4m6!3m5!1s0x31a10928b1ab6507:0xb60ba5cc8a86d8ea!8m2!3d9.3140291!4d105.7199204!16s%2Fg%2F11t2b4dg0m?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng Đào Nguyên Bạc Liêu",
+        "address": "Địa chỉ: 449 QL1A, Vĩnh Lợi, Cà Mau, Việt Nam ",
+        "checkedAt": "2026-10-03T15:23:07.705Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Venue name and house/street address or exact Plus Code match the source pin."
+    },
+    {
+      "id": "VN_1858",
+      "name": "Sân bóng Dương Linh",
+      "address": "Quản Lộ - Phụng Hiệp, Vĩnh Phú Tây, Bạc Liêu",
+      "lat": 9.3836975,
+      "lng": 105.4071273,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+bo%CC%81ng+D%C6%B0%C6%A1ng+Linh/@9.3836975,105.4071273,17z/data=!3m1!4b1!4m6!3m5!1s0x31a1195148950273:0x7f6db8449e606381!8m2!3d9.3836975!4d105.4071273!16s%2Fg%2F11hzyph4xq?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Sân bóng Dương Linh",
+        "address": "Địa chỉ: Quốc lộ Quản Lộ - Phụng Hiệp, Vĩnh Phước, Cà Mau, Việt Nam ",
+        "checkedAt": "2026-10-03T15:23:29.160Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Venue name and house/street address or exact Plus Code match the source pin."
+    },
+    {
+      "id": "VN_1860",
+      "name": "CLB Bóng Bàn Nhà Thi Đấu Cầu Giấy",
+      "address": "35 Trần Quý Kiên, Dịch Vọng, Cầu Giấy, Hà Nội",
+      "lat": 21.0368853,
+      "lng": 105.7913306,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/C%C3%A2u+L%E1%BA%A1c+B%E1%BB%99+B%C3%B3ng+B%C3%A0n+C%E1%BA%A7u+Gi%E1%BA%A5y+-+S%C6%A1n+T%C3%A8+shop/data=!4m7!3m6!1s0x3135ab0027d91e19:0x5fbdc04b63cbae3d!8m2!3d21.0368853!4d105.7913306!16s%2Fg%2F11y8v_3359!19sChIJGR7ZJwCrNTERPa7LY0vAvV8?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Câu Lạc Bộ Bóng Bàn Cầu Giấy - Sơn Tè shop",
+        "address": "Câu Lạc Bộ Bóng Bàn Cầu Giấy - Sơn Tè shop\nCâu Lạc Bộ Bóng Bàn Cầu Giấy - Sơn Tè shop\n4,9\nCâu lạc bộ bóng bàn · 35 P. Trần Quý Kiên\nĐã đóng cửa · Mở cửa lúc 0:00 CN · +84 919 587 766\n\nTrang web\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:23:45.346Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Venue name and house/street address or exact Plus Code match the source pin."
+    },
+    {
+      "id": "VN_1867",
+      "name": "CLB Bóng Bàn Rạch Miễu - Phú Nhuận",
+      "address": "Số 1 Hoa Phượng, Phường 2, Phú Nhuận, TP. Hồ Chí Minh",
+      "lat": 10.7961419,
+      "lng": 106.6871658,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Trung+t%C3%A2m+Th%E1%BB%83+d%E1%BB%A5c+Th%E1%BB%83+thao+R%E1%BA%A1ch+Mi%E1%BB%85u/data=!4m7!3m6!1s0x317528d1ef20afdf:0xf8df1b324187b6e8!8m2!3d10.7961419!4d106.6871658!16s%2Fg%2F11g8z1_b_v!19sChIJ368g79EodTER6LaHQTIb3_g?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Trung tâm Thể dục Thể thao Rạch Miễu",
+        "address": "Trung tâm Thể dục Thể thao Rạch Miễu\nTrung tâm Thể dục Thể thao Rạch Miễu\n4,1\nTổ hợp thể thao · 1 Đ. Hoa Phượng\nMở cả ngày · +84 28 3517 3631\n\nTrang web\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:24:50.102Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Named sports facility and street address match. Coordinates identify the shared facility, not the centre of an individual court."
+    },
+    {
+      "id": "VN_1869",
+      "name": "CLB Bóng Bàn Hoa Lư Quận 1",
+      "address": "Số 2 Đinh Tiên Hoàng, Phường Đa Kao, Quận 1, TP. Hồ Chí Minh",
+      "lat": 10.787406,
+      "lng": 106.7011864,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/CLB+B%C3%B3ng+B%C3%A0n+Hoa+L%C6%B0/@10.787406,106.7011864,17z/data=!3m1!4b1!4m6!3m5!1s0x31752fdc1e46efd7:0xecc943e6cacc9543!8m2!3d10.787406!4d106.7011864!16s%2Fg%2F11f9fvsgx1?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "CLB Bóng Bàn Hoa Lư",
+        "address": "Địa chỉ: Việt Nam, Hồ Chí Minh, Sài Gòn, Đinh Tiên Hoàng ",
+        "checkedAt": "2026-10-03T15:25:06.528Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Distinctive Hoa Lu table tennis club and Dinh Tien Hoang street match."
+    },
+    {
+      "id": "VN_1871",
+      "name": "CLB Bóng Bàn Cung Văn Hóa Lao Động",
+      "address": "55B Nguyễn Thị Minh Khai, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
+      "lat": 10.7763541,
+      "lng": 106.693126,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Cung+V%C4%83n+h%C3%B3a+Lao+%C4%91%E1%BB%99ng+TP.HCM/@10.7763541,106.693126,17z/data=!3m1!4b1!4m6!3m5!1s0x31752fbdcdacd7c5:0x107857fd26472fad!8m2!3d10.7763541!4d106.693126!16s%2Fg%2F11rq3vdvmp?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Cung Văn hóa Lao động TP.HCM",
+        "address": "Địa chỉ: 55B Nguyễn Thị Minh Khai, Bến Thành, Hồ Chí Minh 700000, Việt Nam ",
+        "checkedAt": "2026-10-03T15:25:24.525Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Named sports facility and street address match. Coordinates identify the shared facility, not the centre of an individual court."
+    },
+    {
+      "id": "VN_1872",
+      "name": "CLB Bóng Bàn Tân Bình",
+      "address": "Trung tâm TDTT Tân Bình, 448 Hoàng Văn Thụ, Phường 4, Tân Bình, TP. Hồ Chí Minh",
+      "lat": 10.795179,
+      "lng": 106.6537551,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Trung+t%C3%A2m+V%C4%83n+h%C3%B3a+-+Th%E1%BB%83+thao+qu%E1%BA%ADn+T%C3%A2n+B%C3%ACnh/data=!4m7!3m6!1s0x31752ecb43544e11:0xd019b47b883b033b!8m2!3d10.795179!4d106.6537551!16s%2Fg%2F11b67q0h15!19sChIJEU5UQ8sudTEROwM7iHu0GdA?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Trung tâm Văn hóa - Thể thao quận Tân Bình",
+        "address": "Trung tâm Văn hóa - Thể thao quận Tân Bình\nTrung tâm Văn hóa - Thể thao quận Tân Bình\n4,2\nTrung tâm văn hoá ·  · 448 Đ. Hoàng Văn Thụ\nĐã đóng cửa · Mở cửa lúc 9:00 CN · +84 28 3844 0091\n\nTrang web\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:25:34.486Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Named sports facility and street address match. Coordinates identify the shared facility, not the centre of an individual court."
+    },
+    {
+      "id": "VN_1874",
+      "name": "CLB Bóng Bàn Quân Khu 5",
+      "address": "Số 7 Duy Tân, Hòa Cường Bắc, Hải Châu, Đà Nẵng",
+      "lat": 16.0466937,
+      "lng": 108.215275,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+thi+%C4%91%E1%BA%A5u+Qu%C3%A2n+khu+5/data=!4m7!3m6!1s0x314219a2e921d85b:0x20d5813052837522!8m2!3d16.0466937!4d108.215275!16s%2Fg%2F11fknwtl6p!19sChIJW9gh6aIZQjERInWDUjCB1SA?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Nhà thi đấu Quân khu 5",
+        "address": "Nhà thi đấu Quân khu 5\nNhà thi đấu Quân khu 5\n4,3\nTổ hợp thể thao ·  · 7 Duy Tân\n+84 236 3615 319\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:25:48.167Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Named sports facility and street address match. Coordinates identify the shared facility, not the centre of an individual court."
+    },
+    {
+      "id": "VN_1875",
+      "name": "CLB Bóng Bàn Cung VHTT Việt Tiệp",
+      "address": "53 Lạch Tray, Lạch Tray, Ngô Quyền, Hải Phòng",
+      "lat": 20.8482535,
+      "lng": 106.6916592,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Cung+V%C4%83n+h%C3%B3a+Lao+%C4%91%E1%BB%99ng+h%E1%BB%AFu+ngh%E1%BB%8B+Vi%E1%BB%87t+-+Ti%E1%BB%87p/data=!4m7!3m6!1s0x314a7a91aaeeaf91:0x59c33b4ea5f9fd92!8m2!3d20.8482535!4d106.6916592!16s%2Fg%2F1x6p_7gx!19sChIJka_uqpF6SjERkv35pU47w1k?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Cung Văn hóa Lao động hữu nghị Việt - Tiệp",
+        "address": "Cung Văn hóa Lao động hữu nghị Việt - Tiệp\nCung Văn hóa Lao động hữu nghị Việt - Tiệp\n4,3\nTrung tâm văn hoá ·  · 53 Lạch Tray\nĐã đóng cửa · Mở cửa lúc 5:00 CN · +84 225 3640 035\n\nTrang web\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:25:54.818Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Named sports facility and street address match. Coordinates identify the shared facility, not the centre of an individual court."
+    },
+    {
+      "id": "VN_1879",
+      "name": "Sân Bóng Rổ Cung Thể Thao Quần Ngựa",
+      "address": "Số 30 Văn Cao, Liễu Giai, Ba Đình, Hà Nội",
+      "lat": 21.0403192,
+      "lng": 105.8145012,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Cung+th%E1%BB%83+thao+Qu%E1%BA%A7n+Ng%E1%BB%B1a/@21.0403192,105.8145012,17z/data=!3m1!4b1!4m6!3m5!1s0x3135ab11822392d9:0x35e9bf7fa41ae21f!8m2!3d21.0403192!4d105.8145012!16s%2Fg%2F122npbp2?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Cung thể thao Quần Ngựa",
+        "address": "Địa chỉ: 30 Đ. Văn Cao, Ngọc Hà, Hà Nội, Việt Nam ",
+        "checkedAt": "2026-10-03T15:26:23.423Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1880",
+      "name": "Sân Bóng Rổ Nhà Thi Đấu ĐH Y Hà Nội",
+      "address": "Số 1 Tôn Thất Tùng, Khương Thượng, Đống Đa, Hà Nội",
+      "lat": 21.0014576,
+      "lng": 105.8326075,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+Thi+%C4%90%E1%BA%A5u+%C4%90H+Y/data=!4m7!3m6!1s0x3135ac7c4f400001:0x7115616e177cc65e!8m2!3d21.0014576!4d105.8326075!16s%2Fg%2F11c529fmd9!19sChIJAQBAT3ysNTERXsZ8F25hFXE?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Nhà Thi Đấu ĐH Y",
+        "address": "Nhà Thi Đấu ĐH Y\nNhà Thi Đấu ĐH Y\n4,4\nTổ hợp thể thao · 2R2M+H2Q, P. Khương Thượng\nĐã đóng cửa · Mở cửa lúc 6:00 CN\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:26:32.898Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1882",
+      "name": "Sân Bóng Rổ Nhà Thi Đấu Cầu Giấy",
+      "address": "35 Trần Quý Kiên, Dịch Vọng, Cầu Giấy, Hà Nội",
+      "lat": 21.036978,
+      "lng": 105.7916615,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+Thi+%C4%90%E1%BA%A5u+C%E1%BA%A7u+Gi%E1%BA%A5y/@21.036978,105.7916615,17z/data=!3m1!4b1!4m6!3m5!1s0x3135ab37d1db3d6d:0x7827a9be7b8a3790!8m2!3d21.036978!4d105.7916615!16s%2Fg%2F1trxb57w?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Nhà Thi Đấu Cầu Giấy",
+        "address": "Địa chỉ: P. Trần Quý Kiên/35 P. Dịch Vọng, Cầu Giấy, Hà Nội, Việt Nam ",
+        "checkedAt": "2026-10-03T15:26:51.117Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1883",
+      "name": "Sân Bóng Rổ Trung Tâm TDTT Thanh Xuân",
+      "address": "166 Khuất Duy Tiến, Nhân Chính, Thanh Xuân, Hà Nội",
+      "lat": 21.0021496,
+      "lng": 105.7975416,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+r%E1%BB%95+Thanh+Xu%C3%A2n/data=!4m7!3m6!1s0x3135ad969e793393:0xe1905ee168a3a83f!8m2!3d21.0021496!4d105.7975416!16s%2Fg%2F11t2wp1x_7!19sChIJkzN5npatNTERP6ijaOFekOE?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Sân bóng rổ Thanh Xuân",
+        "address": "Sân bóng rổ Thanh Xuân\nSân bóng rổ Thanh Xuân\n4,7\nSân bóng rổ · 166 Đ. Khuất Duy Tiến\nSắp đóng cửa · 22:30 · Mở cửa lúc 6:30 CN · +84 369 993 662\n\nTrang web\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:27:05.398Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched named venue and street address or exact Plus Code."
+    },
+    {
+      "id": "VN_1884",
+      "name": "Sân Bóng Rổ Nhà Thi Đấu Bách Khoa",
+      "address": "42 Tạ Quang Bửu, Bách Khoa, Hai Bà Trưng, Hà Nội",
+      "lat": 21.0035324,
+      "lng": 105.8470866,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+thi+%C4%91%E1%BA%A5u+B%C3%A1ch+Khoa/@21.0035324,105.8470866,17z/data=!3m1!4b1!4m6!3m5!1s0x3135ac743dae7553:0xacb8a162dfb838dc!8m2!3d21.0035324!4d105.8470866!16s%2Fg%2F11bw5vxz9j?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Nhà thi đấu Bách Khoa",
+        "address": "Địa chỉ: 2R3W+CR8, P. Tạ Quang Bửu, Bạch Mai, Hà Nội, Việt Nam ",
+        "checkedAt": "2026-10-03T15:27:11.863Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1887",
+      "name": "Sân Bóng Rổ Nhà Thi Đấu Hồ Xuân Hương",
+      "address": "Số 2 Hồ Xuân Hương, Phường Võ Thị Sáu, Quận 3, TP. Hồ Chí Minh",
+      "lat": 10.7773249,
+      "lng": 106.6874933,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+Thi+%C4%90%E1%BA%A5u+H%E1%BB%93+Xu%C3%A2n+H%C6%B0%C6%A1ng/@10.7773249,106.6874933,17z/data=!3m1!4b1!4m6!3m5!1s0x31752f25372311ad:0xa8adcf38403d223d!8m2!3d10.7773249!4d106.6874933!16s%2Fg%2F11h0vtqlgt?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Nhà Thi Đấu Hồ Xuân Hương",
+        "address": "Địa chỉ: 2 Hồ Xuân Hương, Xuân Hòa, Hồ Chí Minh, Việt Nam ",
+        "checkedAt": "2026-10-03T15:27:33.240Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1888",
+      "name": "Sân Bóng Rổ Cung Văn Hóa Lao Động TP.HCM",
+      "address": "55B Nguyễn Thị Minh Khai, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
+      "lat": 10.7763541,
+      "lng": 106.693126,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Cung+V%C4%83n+h%C3%B3a+Lao+%C4%91%E1%BB%99ng+TP.HCM/data=!4m7!3m6!1s0x31752fbdcdacd7c5:0x107857fd26472fad!8m2!3d10.7763541!4d106.693126!16s%2Fg%2F11rq3vdvmp!19sChIJxdeszb0vdTERrS9HJv1XeBA?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Cung Văn hóa Lao động TP.HCM",
+        "address": "Cung Văn hóa Lao động TP.HCM\nCung Văn hóa Lao động TP.HCM\n4,4\nTrung tâm văn hoá ·  · 55B Nguyễn Thị Minh Khai\nĐã đóng cửa · Mở cửa lúc 6:00 CN · +84 28 3930 7512\n\nTrang web\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:27:41.578Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1889",
+      "name": "Sân Bóng Rổ Nhà Thi Đấu Phú Thọ",
+      "address": "219 Lý Thường Kiệt, Phường 15, Quận 11, TP. Hồ Chí Minh",
+      "lat": 10.7658487,
+      "lng": 106.6586938,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/S%C3%A2n+b%C3%B3ng+r%E1%BB%95/data=!4m7!3m6!1s0x31752fb71ed4d5ab:0xe7ee91327af58be2!8m2!3d10.7658487!4d106.6586938!16s%2Fg%2F11t3l8kjfv!19sChIJq9XUHrcvdTER4ov1ejKR7uc?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Sân bóng rổ",
+        "address": "Sân bóng rổ\nSân bóng rổ\n4,6\nSân bóng rổ · 219 Đ. Lý Thường Kiệt\nMở cả ngày · +84 775 030 555\n\nTrang web\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:27:46.748Z",
+        "precision": "venue"
+      },
+      "reviewNote": "Matched named venue and street address or exact Plus Code."
+    },
+    {
+      "id": "VN_1891",
+      "name": "Sân Bóng Rổ Trung Tâm TDTT Tân Bình",
+      "address": "448 Hoàng Văn Thụ, Phường 4, Tân Bình, TP. Hồ Chí Minh",
+      "lat": 10.795179,
+      "lng": 106.6537551,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Trung+t%C3%A2m+V%C4%83n+h%C3%B3a+-+Th%E1%BB%83+thao+qu%E1%BA%ADn+T%C3%A2n+B%C3%ACnh/data=!4m7!3m6!1s0x31752ecb43544e11:0xd019b47b883b033b!8m2!3d10.795179!4d106.6537551!16s%2Fg%2F11b67q0h15!19sChIJEU5UQ8sudTEROwM7iHu0GdA?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Trung tâm Văn hóa - Thể thao quận Tân Bình",
+        "address": "Trung tâm Văn hóa - Thể thao quận Tân Bình\nTrung tâm Văn hóa - Thể thao quận Tân Bình\n4,2\nTrung tâm văn hoá ·  · 448 Đ. Hoàng Văn Thụ\nĐã đóng cửa · Mở cửa lúc 9:00 CN · +84 28 3844 0091\n\nTrang web\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:27:57.456Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1892",
+      "name": "Sân Bóng Rổ Nhà Thi Đấu Lãnh Binh Thăng",
+      "address": "283 Lãnh Binh Thăng, Phường 8, Quận 11, TP. Hồ Chí Minh",
+      "lat": 10.7638925,
+      "lng": 106.6486071,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+thi+%C4%91%E1%BA%A5u+L%C3%A3nh+Binh+Th%C4%83ng/@10.7638925,106.6486071,17z/data=!3m1!4b1!4m6!3m5!1s0x31752e939a4b5a27:0x775ee05ddb90e01a!8m2!3d10.7638925!4d106.6486071!16s%2Fg%2F1vljcv52?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Nhà thi đấu Lãnh Binh Thăng",
+        "address": "Địa chỉ: 283 Lãnh Binh Thăng, Bình Thới, Hồ Chí Minh, Việt Nam ",
+        "checkedAt": "2026-10-03T15:28:02.716Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1893",
+      "name": "Sân Bóng Rổ Cung Thể Thao Tiên Sơn",
+      "address": "03 Phan Đăng Lưu, Hòa Cường Bắc, Hải Châu, Đà Nẵng",
+      "lat": 16.0368203,
+      "lng": 108.2264605,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Cung+Th%E1%BB%83+Thao+Ti%C3%AAn+S%C6%A1n/@16.0368203,108.2264605,17z/data=!3m1!4b1!4m6!3m5!1s0x314219e91ac18ded:0x62fbb8d47ec96199!8m2!3d16.0368203!4d108.2264605!16s%2Fg%2F11f3w6nb2y?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Cung Thể Thao Tiên Sơn",
+        "address": "Địa chỉ: Phan Đăng Lưu, Hòa Cường, Đà Nẵng, Việt Nam ",
+        "checkedAt": "2026-10-03T15:28:10.890Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1894",
+      "name": "Sân Bóng Rổ Quân Khu 5 Đà Nẵng",
+      "address": "Số 7 Duy Tân, Hòa Cường Bắc, Hải Châu, Đà Nẵng",
+      "lat": 16.0466937,
+      "lng": 108.215275,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+thi+%C4%91%E1%BA%A5u+Qu%C3%A2n+khu+5/data=!4m7!3m6!1s0x314219a2e921d85b:0x20d5813052837522!8m2!3d16.0466937!4d108.215275!16s%2Fg%2F11fknwtl6p!19sChIJW9gh6aIZQjERInWDUjCB1SA?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Nhà thi đấu Quân khu 5",
+        "address": "Nhà thi đấu Quân khu 5\nNhà thi đấu Quân khu 5\n4,3\nTổ hợp thể thao ·  · 7 Duy Tân\n+84 236 3615 319\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:28:19.160Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1896",
+      "name": "Sân Bóng Rổ Trung Tâm TDTT Cần Thơ",
+      "address": "Số 3 Lê Lợi, Cái Khế, Ninh Kiều, Cần Thơ",
+      "lat": 10.0465664,
+      "lng": 105.789991,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+Thi+%C4%90%E1%BA%A5u+%C4%90a+N%C4%83ng+Th%C3%A0nh+Ph%E1%BB%91+C%E1%BA%A7n+Th%C6%A1/data=!4m7!3m6!1s0x31a062aeef9c3db3:0x3a575b759ea55bb9!8m2!3d10.0465664!4d105.789991!16s%2Fg%2F1tfdwbqz!19sChIJsz2c765ioDERuVulnnVbVzo?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Nhà Thi Đấu Đa Năng Thành Phố Cần Thơ",
+        "address": "Nhà Thi Đấu Đa Năng Thành Phố Cần Thơ\nNhà Thi Đấu Đa Năng Thành Phố Cần Thơ\n4,1\nTổ hợp thể thao ·  · 3 Lê Lợi\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:28:29.796Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1898",
+      "name": "Sân Bóng Chuyền Nhà Thi Đấu Tây Hồ",
+      "address": "101 Xuân La, Phường Xuân La, Tây Hồ, Hà Nội",
+      "lat": 21.063182,
+      "lng": 105.8036198,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+thi+%C4%91%E1%BA%A5u+T%C3%A2y+H%E1%BB%93/@21.063182,105.8036198,17z/data=!3m1!4b1!4m6!3m5!1s0x3135aadde0f23a3d:0xc81eb07f52e8cf56!8m2!3d21.063182!4d105.8036198!16s%2Fg%2F11c2lc7x2w?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Nhà thi đấu Tây Hồ",
+        "address": "Địa chỉ: 101 Đ. Xuân La, Khu đô thị Tây Hồ Tây, Xuân Đỉnh, Hà Nội, Việt Nam ",
+        "checkedAt": "2026-10-03T15:28:42.044Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1899",
+      "name": "Sân Bóng Chuyền Cung Điền Kinh Mỹ Đình",
+      "address": "Đường Trần Hữu Dực, Mỹ Đình 1, Nam Từ Liêm, Hà Nội",
+      "lat": 21.0289775,
+      "lng": 105.7630018,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Cung+Th%E1%BB%83+Thao+%C4%90i%E1%BB%81n+Kinh/data=!4m7!3m6!1s0x313454bc910c584b:0x2c2f686cfbc6dfb2!8m2!3d21.0289775!4d105.7630018!16s%2Fg%2F121gdclc!19sChIJS1gMkbxUNDERst_G-2xoLyw?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Cung Thể Thao Điền Kinh",
+        "address": "Cung Thể Thao Điền Kinh\nCung Thể Thao Điền Kinh\n4,3\nTổ hợp thể thao ·  · Trần Hữu Dực\nMở cả ngày · +84 28 7305 1488\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:28:51.242Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1900",
+      "name": "Sân Bóng Chuyền Trung Tâm Thể Thao ĐH Bách Khoa",
+      "address": "Khu thể thao Bách Khoa, Tạ Quang Bửu, Hai Bà Trưng, Hà Nội",
+      "lat": 21.0035324,
+      "lng": 105.8470866,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+thi+%C4%91%E1%BA%A5u+B%C3%A1ch+Khoa/data=!4m7!3m6!1s0x3135ac743dae7553:0xacb8a162dfb838dc!8m2!3d21.0035324!4d105.8470866!16s%2Fg%2F11bw5vxz9j!19sChIJU3WuPXSsNTER3Di432KhuKw?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Nhà thi đấu Bách Khoa",
+        "address": "Nhà thi đấu Bách Khoa\nNhà thi đấu Bách Khoa\n4,2\nTổ hợp thể thao · 2R3W+CR8, P. Tạ Quang Bửu\nĐang mở cửa · Đóng cửa vào 0:00 · +84 943 409 386\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:28:57.139Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1901",
+      "name": "Sân Bóng Chuyền Nhà Thi Đấu Gia Lâm",
+      "address": "Thị trấn Trâu Quỳ, Gia Lâm, Hà Nội",
+      "lat": 21.0181995,
+      "lng": 105.9439141,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+thi+%C4%91%E1%BA%A5u+Gia+L%C3%A2m/@21.0181995,105.9439141,17z/data=!3m1!4b1!4m6!3m5!1s0x3135a96d57466dd3:0x84f058e3ba736ad5!8m2!3d21.0181995!4d105.9439141!16s%2Fg%2F11bcclxw1k?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Nhà thi đấu Gia Lâm",
+        "address": "Địa chỉ: 453 Nguyễn Đức Thuận, Gia Lâm, Hà Nội, Việt Nam ",
+        "checkedAt": "2026-10-03T15:29:03.657Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1902",
+      "name": "Sân Bóng Chuyền Nhà Thi Đấu Hà Đông",
+      "address": "182 Quang Trung, Phường Quang Trung, Hà Đông, Hà Nội",
+      "lat": 20.9675348,
+      "lng": 105.7708422,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+thi+%C4%91%E1%BA%A5u+H%C3%A0+%C4%90%C3%B4ng/data=!4m7!3m6!1s0x3134530046c1ce33:0x1dbf95e41de8cc!8m2!3d20.9675348!4d105.7708422!16s%2Fg%2F11zc4l20lj!19sChIJM87BRgBTNDERzOgd5JW_HQA?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Nhà thi đấu Hà Đông",
+        "address": "Nhà thi đấu Hà Đông\nNhà thi đấu Hà Đông\n5,0\nCâu lạc bộ thể thao · XQ9C+288\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:29:11.956Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1903",
+      "name": "Sân Bóng Chuyền Nhà Thi Đấu Rạch Miễu",
+      "address": "Số 1 Hoa Phượng, Phường 2, Phú Nhuận, TP. Hồ Chí Minh",
+      "lat": 10.7961419,
+      "lng": 106.6871658,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Trung+t%C3%A2m+Th%E1%BB%83+d%E1%BB%A5c+Th%E1%BB%83+thao+R%E1%BA%A1ch+Mi%E1%BB%85u/@10.7961419,106.6871658,17z/data=!3m1!4b1!4m6!3m5!1s0x317528d1ef20afdf:0xf8df1b324187b6e8!8m2!3d10.7961419!4d106.6871658!16s%2Fg%2F11g8z1_b_v?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Trung tâm Thể dục Thể thao Rạch Miễu",
+        "address": "Địa chỉ: 1 Đ. Hoa Phượng, Cầu Kiệu, Hồ Chí Minh 72210, Việt Nam ",
+        "checkedAt": "2026-10-03T15:29:17.291Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1904",
+      "name": "Sân Bóng Chuyền Trung Tâm TDTT Tân Bình",
+      "address": "448 Hoàng Văn Thụ, Phường 4, Tân Bình, TP. Hồ Chí Minh",
+      "lat": 10.795179,
+      "lng": 106.6537551,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Trung+t%C3%A2m+V%C4%83n+h%C3%B3a+-+Th%E1%BB%83+thao+qu%E1%BA%ADn+T%C3%A2n+B%C3%ACnh/data=!4m7!3m6!1s0x31752ecb43544e11:0xd019b47b883b033b!8m2!3d10.795179!4d106.6537551!16s%2Fg%2F11b67q0h15!19sChIJEU5UQ8sudTEROwM7iHu0GdA?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Trung tâm Văn hóa - Thể thao quận Tân Bình",
+        "address": "Trung tâm Văn hóa - Thể thao quận Tân Bình\nTrung tâm Văn hóa - Thể thao quận Tân Bình\n4,2\nTrung tâm văn hoá ·  · 448 Đ. Hoàng Văn Thụ\nĐã đóng cửa · Mở cửa lúc 9:00 CN · +84 28 3844 0091\n\nTrang web\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:29:25.724Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1905",
+      "name": "Sân Bóng Chuyền CLB Thể Thao Nguyễn Du",
+      "address": "116 Nguyễn Du, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh",
+      "lat": 10.7733142,
+      "lng": 106.6936454,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Clb+V%C4%83n+H%C3%B3a+Tdtt+Nguy%E1%BB%85n+Du/data=!4m7!3m6!1s0x31752f395564c97f:0x660954888b3b53ad!8m2!3d10.7733142!4d106.6936454!16s%2Fg%2F1pp2v1svc!19sChIJf8lkVTkvdTERrVM7i4hUCWY?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Clb Văn Hóa Tdtt Nguyễn Du",
+        "address": "Clb Văn Hóa Tdtt Nguyễn Du\nClb Văn Hóa Tdtt Nguyễn Du\n4,2\nCâu lạc bộ thể thao · 116 Nguyễn Du\n+84 28 3824 5918\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:29:31.865Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1906",
+      "name": "Sân Bóng Chuyền Trung Tâm TDTT Hoa Lư",
+      "address": "Số 2 Đinh Tiên Hoàng, Phường Đa Kao, Quận 1, TP. Hồ Chí Minh",
+      "lat": 10.7879361,
+      "lng": 106.7015942,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Trung+t%C3%A2m+Th%E1%BB%83+d%E1%BB%A5c+Th%E1%BB%83+thao+Hoa+L%C6%B0/@10.7879361,106.7015942,17z/data=!3m1!4b1!4m6!3m5!1s0x31752f4ac0282147:0x5e20fe3a05eb7bcf!8m2!3d10.7879361!4d106.7015942!16s%2Fg%2F11hzxvm76v?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Trung tâm Thể dục Thể thao Hoa Lư",
+        "address": "Địa chỉ: 2 Đinh Tiên Hoàng, Sài Gòn, Hồ Chí Minh, Việt Nam ",
+        "checkedAt": "2026-10-03T15:29:37.066Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1909",
+      "name": "Sân Bóng Chuyền Nhà Thi Đấu Quân Khu 5 Đà Nẵng",
+      "address": "Số 7 Duy Tân, Hòa Cường Bắc, Hải Châu, Đà Nẵng",
+      "lat": 16.0466937,
+      "lng": 108.215275,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+thi+%C4%91%E1%BA%A5u+Qu%C3%A2n+khu+5/data=!4m7!3m6!1s0x314219a2e921d85b:0x20d5813052837522!8m2!3d16.0466937!4d108.215275!16s%2Fg%2F11fknwtl6p!19sChIJW9gh6aIZQjERInWDUjCB1SA?authuser=0&hl=vi&g_ep=EgoyMDI2MDkzMC4wIJJjKgBIAVAD&rclk=1",
+        "name": "Nhà thi đấu Quân khu 5",
+        "address": "Nhà thi đấu Quân khu 5\nNhà thi đấu Quân khu 5\n4,3\nTổ hợp thể thao ·  · 7 Duy Tân\n+84 236 3615 319\n\nĐường đi",
+        "checkedAt": "2026-10-03T15:29:59.134Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    },
+    {
+      "id": "VN_1912",
+      "name": "Sân Bóng Chuyền Nhà Thi Đấu Tỉnh Ninh Bình",
+      "address": "Đường Đinh Tiên Hoàng, Phường Đông Thành, TP. Ninh Bình, Ninh Bình",
+      "lat": 20.2674289,
+      "lng": 105.9742938,
+      "source": {
+        "provider": "Google Maps public place",
+        "url": "https://www.google.com/maps/place/Nh%C3%A0+Thi+%C4%90%E1%BA%A5u+Th%E1%BB%83+D%E1%BB%A5c+Th%E1%BB%83+Thao+T%E1%BB%89nh+Ninh+B%C3%ACnh/@20.2674289,105.9742938,17z/data=!3m1!4b1!4m6!3m5!1s0x31367759cc92b38b:0x4dd0f3ff63ffe09f!8m2!3d20.2674289!4d105.9742938!16s%2Fg%2F1hc2c3r8t?hl=vi&entry=ttu&g_ep=EgoyMDI2MDkzMC4wIKXMDSoASAFQAw%3D%3D",
+        "name": "Nhà Thi Đấu Thể Dục Thể Thao Tỉnh Ninh Bình",
+        "address": "Địa chỉ: 7X8F+XPF, Đinh Tiên Hoàng, Hoa Lư, Ninh Bình, Việt Nam ",
+        "checkedAt": "2026-10-03T15:30:15.864Z",
+        "precision": "facility"
+      },
+      "reviewNote": "Matched named sports facility and its address/campus. Coordinate identifies the shared facility, not an individual court."
+    }
+  ]
+}
