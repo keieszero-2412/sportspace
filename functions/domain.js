@@ -58,8 +58,8 @@ export function lockIds(courtId, ranges) {
   ].sort();
 }
 export function quote(court, facility, ranges) {
-  const price = court.basePrice || court.price_day || court.price_night || 0;
-  if (!Number.isSafeInteger(price) || price <= 0)
+  const basePrice = court.basePrice || court.price_day || court.price_night || 0;
+  if (!Number.isSafeInteger(basePrice) || basePrice <= 0)
     throw new Error("missing-price");
   const pricing = facility.pricing || {};
   let total = 0;
@@ -74,11 +74,20 @@ export function quote(court, facility, ranges) {
         peakStart <= peakEnd
           ? min >= peakStart && min < peakEnd
           : min >= peakStart || min < peakEnd;
-      const increase = pricing.enabled
-        ? (weekend ? Number(pricing.weekendPercent || 0) : 0) +
-        (peak ? Number(pricing.peakPercent || 0) : 0)
-        : 0;
-      total += Math.round((price * (1 + increase / 100)) / 2);
+
+      let currentSlotPrice = basePrice;
+      if (court.price_weekend || court.price_night || court.price_day) {
+        if (weekend) currentSlotPrice = court.price_weekend || court.price_night || court.price_day || basePrice;
+        else if (peak) currentSlotPrice = court.price_night || court.price_day || basePrice;
+        else currentSlotPrice = court.price_day || basePrice;
+      } else {
+        const increase = pricing.enabled
+          ? (weekend ? Number(pricing.weekendPercent || 0) : 0) +
+            (peak ? Number(pricing.peakPercent || 0) : 0)
+          : 0;
+        currentSlotPrice = basePrice * (1 + increase / 100);
+      }
+      total += Math.round(currentSlotPrice / 2);
     }
   }
   if (!Number.isSafeInteger(total) || total <= 0)

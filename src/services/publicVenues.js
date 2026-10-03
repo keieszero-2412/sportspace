@@ -126,22 +126,12 @@ export async function listPublicVenues(data = {}) {
 }
 
 async function listProvinces() {
-  const provinces = [];
-  let cursor;
-  // Jump past each province's entire index range instead of reading every venue.
-  while (true) {
-    const snapshot = await getDocsFromServer(
-      query(
-        collection(db, "Facilities"),
-        orderBy("province"),
-        ...(cursor === undefined ? [] : [startAfter(cursor)]),
-        limit(1),
-      ),
-    );
-    if (snapshot.empty) return provinces.sort();
-    cursor = snapshot.docs[0].data().province;
-    if (typeof cursor === "string" && cursor.trim()) provinces.push(cursor);
-  }
+  return [
+    "An Giang", "Bắc Ninh", "Cà Mau", "Cao Bằng", "Cần Thơ", "Đà Nẵng", "Đắk Lắk", "Điện Biên", "Đồng Nai", "Đồng Tháp",
+    "Gia Lai", "Hà Nội", "Hà Tĩnh", "Hải Phòng", "Hồ Chí Minh", "Huế", "Hưng Yên", "Khánh Hòa", "Lai Châu", "Lâm Đồng",
+    "Lạng Sơn", "Lào Cai", "Nghệ An", "Ninh Bình", "Phú Thọ", "Quảng Ngãi", "Quảng Ninh", "Quảng Trị", "Sơn La", "Tây Ninh",
+    "Thái Nguyên", "Thanh Hóa", "Tuyên Quang", "Vĩnh Long"
+  ];
 }
 
 export async function publicCatalogue() {

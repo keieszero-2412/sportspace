@@ -48,7 +48,7 @@ const errors = {
 };
 const publicCache = new Map();
 const inFlight = new Map();
-const cacheStorageKey = `sportspace:public-catalogue:v3:${db.app.options.projectId}`;
+const cacheStorageKey = `sportspace:public-catalogue:v4:${db.app.options.projectId}`;
 try {
   const entries = JSON.parse(localStorage.getItem(cacheStorageKey) || "[]");
   if (Array.isArray(entries))

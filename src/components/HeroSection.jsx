@@ -920,7 +920,7 @@ export default function HeroSection({
                         >
                           <span className="truncate pr-2">
                             {selectedProvince === "ALL"
-                              ? `📍 ${lang === "vi" ? "Tất cả khu vực" : "All Locations"} (${provincesList.length || 62})`
+                              ? `${lang === "vi" ? "Tất cả khu vực" : "All Locations"} (${provincesList.length || 62})`
                               : selectedProvince}
                           </span>
                           <ChevronDown
@@ -996,7 +996,6 @@ export default function HeroSection({
                                 }}
                               >
                                 <span>
-                                  📍{" "}
                                   {lang === "vi"
                                     ? "Tất cả khu vực"
                                     : "All Locations"}
