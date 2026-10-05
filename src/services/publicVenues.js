@@ -1,19 +1,13 @@
-import {
-  collection,
-  documentId,
-  getCountFromServer,
-  getDocsFromServer,
-  limit,
-  orderBy,
-  query,
-  startAfter,
-  where,
-} from "firebase/firestore";
-import { db } from "../firebase";
+import { supabase } from "../supabase";
 import { getDistance } from "../utils/geo";
+import bundledVenues from "../data/venues.json";
 
 const PAGE_SIZE = 24;
 const BATCH_SIZE = 60;
+const bundledCourtCount = bundledVenues.reduce(
+  (total, venue) => total + (Number(venue.scale_courts) || 0),
+  0,
+);
 const normalize = (value) =>
   String(value || "")
     .normalize("NFD")
@@ -50,15 +44,66 @@ const publicFields = [
   "lat",
   "lng",
 ];
-function publicVenue(snapshot) {
-  const data = snapshot.data();
+
+function publicVenue(data) {
   return {
     ...Object.fromEntries(
       publicFields
         .filter((key) => data[key] !== undefined)
         .map((key) => [key, data[key]]),
     ),
-    id: snapshot.id,
+    id: data.id,
+  };
+}
+
+function matchesVenue(venue, data, search) {
+  if (venue.status === "archived") return false;
+  if (data.province && data.province !== "ALL" && venue.province !== data.province)
+    return false;
+  if (data.sport && data.sport !== "ALL" && venue.sport !== data.sport)
+    return false;
+  if (
+    data.amenity &&
+    data.amenity !== "ALL" &&
+    !(Array.isArray(venue.amenities) ? venue.amenities : []).some((value) =>
+      normalize(value).includes(normalize(data.amenity)),
+    )
+  )
+    return false;
+  if (
+    search &&
+    !normalize(
+      `${venue.name || ""} ${venue.address || ""} ${venue.province || ""} ${venue.name_en || ""}`,
+    ).includes(search)
+  )
+    return false;
+  return true;
+}
+
+function applyDistance(venue, data) {
+  if (data.userLat && data.userLng && data.maxDistance && data.maxDistance !== "ALL") {
+    const distance = getDistance(data.userLat, data.userLng, venue.lat, venue.lng);
+    if (distance === null || distance > Number(data.maxDistance)) return null;
+    return { ...venue, distance };
+  }
+  return venue;
+}
+
+function listBundledVenues(data, search) {
+  const filtered = bundledVenues
+    .map(publicVenue)
+    .filter((venue) => matchesVenue(venue, data, search))
+    .map((venue) => applyDistance(venue, data))
+    .filter(Boolean);
+  const nextIndex = data.cursor
+    ? filtered.findIndex((venue) => venue.id > data.cursor)
+    : 0;
+  const start = nextIndex === -1 ? filtered.length : nextIndex;
+  const items = filtered.slice(start, start + PAGE_SIZE);
+  return {
+    items,
+    cursor: items.at(-1)?.id || data.cursor || null,
+    hasMore: start + items.length < filtered.length,
   };
 }
 
@@ -66,58 +111,39 @@ export async function listPublicVenues(data = {}) {
   const items = [];
   let cursor = data.cursor || null;
   let hasMore = true;
-  // Use one equality index so production needs no new composite index.
-  const constraints = [];
-  if (data.province && data.province !== "ALL")
-    constraints.push(where("province", "==", data.province));
-  else if (data.sport && data.sport !== "ALL")
-    constraints.push(where("sport", "==", data.sport));
+  
   const search = normalize(data.search?.trim());
   while (items.length < PAGE_SIZE && hasMore) {
-    const snapshot = await getDocsFromServer(
-      query(
-        collection(db, "Facilities"),
-        ...constraints,
-        orderBy(documentId()),
-        ...(cursor ? [startAfter(cursor)] : []),
-        limit(BATCH_SIZE),
-      ),
-    );
-    hasMore = snapshot.size === BATCH_SIZE;
-    for (let i = 0; i < snapshot.docs.length; i++) {
-      const doc = snapshot.docs[i];
+    let q = supabase.from("Facilities").select("*").order("id").limit(BATCH_SIZE);
+    
+    if (data.province && data.province !== "ALL") {
+      q = q.eq("province", data.province);
+    } else if (data.sport && data.sport !== "ALL") {
+      q = q.eq("sport", data.sport);
+    }
+    
+    if (cursor) {
+      q = q.gt("id", cursor);
+    }
+    
+    const { data: snapshot, error } = await q;
+    if (error) throw error;
+    if (!snapshot.length && !items.length && !data.cursor) {
+      return listBundledVenues(data, search);
+    }
+    
+    hasMore = snapshot.length === BATCH_SIZE;
+    
+    for (let i = 0; i < snapshot.length; i++) {
+      const doc = snapshot[i];
       cursor = doc.id;
       const venue = publicVenue(doc);
-      if (venue.status === "archived") continue;
-      if (data.sport && data.sport !== "ALL" && venue.sport !== data.sport)
-        continue;
-      if (
-        data.amenity &&
-        data.amenity !== "ALL" &&
-        !(Array.isArray(venue.amenities) ? venue.amenities : []).some((value) =>
-          normalize(value).includes(normalize(data.amenity)),
-        )
-      )
-        continue;
-      if (
-        search &&
-        !normalize(
-          `${venue.name || ""} ${venue.address || ""} ${venue.province || ""} ${venue.name_en || ""}`,
-        ).includes(search)
-      )
-        continue;
-
-      if (data.userLat && data.userLng && data.maxDistance && data.maxDistance !== "ALL") {
-        const dist = getDistance(data.userLat, data.userLng, venue.lat, venue.lng);
-        if (dist === null || dist > Number(data.maxDistance)) {
-          continue;
-        }
-        venue.distance = dist; // attach to show in UI
-      }
-
-      items.push(venue);
+      if (!matchesVenue(venue, data, search)) continue;
+      const distanceVenue = applyDistance(venue, data);
+      if (!distanceVenue) continue;
+      items.push(distanceVenue);
       if (items.length === PAGE_SIZE) {
-        hasMore = i < snapshot.docs.length - 1 || hasMore;
+        hasMore = i < snapshot.length - 1 || hasMore;
         break;
       }
     }
@@ -137,12 +163,15 @@ async function listProvinces() {
 export async function publicCatalogue() {
   const [provinces, facilities, courts] = await Promise.all([
     listProvinces(),
-    getCountFromServer(collection(db, "Facilities")),
-    getCountFromServer(collection(db, "Courts")),
+    supabase.from("Facilities").select("*", { count: "exact", head: true }),
+    supabase.from("Courts").select("*", { count: "exact", head: true }),
   ]);
+  if (facilities.error) throw facilities.error;
+  if (courts.error) throw courts.error;
+
   return {
     provinces,
-    totalVenues: facilities.data().count,
-    totalCourts: courts.data().count,
+    totalVenues: facilities.count || bundledVenues.length,
+    totalCourts: courts.count || bundledCourtCount,
   };
 }

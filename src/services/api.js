@@ -1,18 +1,4 @@
-import { httpsCallable } from "firebase/functions";
-import { functions, db, storage } from "../firebase";
-import {
-  collection,
-  query,
-  where,
-  limit,
-  orderBy,
-  onSnapshot,
-  doc,
-  getDoc,
-  updateDoc,
-  writeBatch,
-} from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL, getBlob } from "firebase/storage";
+import { supabase } from "../supabase";
 import { listPublicVenues, publicCatalogue } from "./publicVenues";
 const errors = {
   "payment-verification-required":
@@ -45,10 +31,14 @@ const errors = {
     "Bạn không có quyền quản lý cơ sở này. / You do not own this facility.",
   "active-transactions-prevent-deletion":
     "Cần xử lý đơn hoặc kèo đang hoạt động trước khi xóa tài khoản. / Resolve active orders or matches first.",
+  WORKER_RESOURCE_LIMIT:
+    "Dịch vụ đặt sân đang quá tải hoặc chưa cấu hình kết nối máy chủ. Vui lòng thử lại sau ít phút. / Booking service is overloaded or missing its server connection. Please try again in a few minutes.",
+  "database-not-configured":
+    "Chức năng đặt sân chưa được cấu hình kết nối cơ sở dữ liệu. Vui lòng báo quản trị viên. / Booking database connection is not configured. Please contact an administrator.",
 };
 const publicCache = new Map();
 const inFlight = new Map();
-const cacheStorageKey = `sportspace:public-catalogue:v4:${db.app.options.projectId}`;
+const cacheStorageKey = `sportspace:public-catalogue:v5:supabase-bundled-fallback`;
 try {
   const entries = JSON.parse(localStorage.getItem(cacheStorageKey) || "[]");
   if (Array.isArray(entries))
@@ -84,10 +74,38 @@ export async function api(action, data = {}) {
       ? action === "catalogue"
         ? publicCatalogue()
         : listPublicVenues(data)
-      : httpsCallable(
-          functions,
-          "sportspace",
-        )({ ...data, action }).then((result) => result.data);
+      : (async () => {
+          const { data: res, error } = await supabase.functions.invoke("sportspace", {
+            body: { action, data },
+            timeout: 15000,
+          });
+          if (error) {
+            // Try to extract real error body from FunctionsHttpError
+            if (error.context) {
+              try {
+                const body = await error.context.json();
+                console.error("Backend Error:", body);
+                let msg = body.error || error.message;
+                if (body.detail) msg += " | " + body.detail;
+                if (body.hint) msg += " | hint: " + body.hint;
+                if (body.code) msg += " | code: " + body.code;
+                throw new Error(msg);
+              } catch (e2) {
+                if (e2 !== error) throw e2;
+              }
+            }
+            throw error;
+          }
+          if (res?.error) {
+            let msg = res.error;
+            if (res.detail) msg += " | " + res.detail;
+            if (res.hint) msg += " | hint: " + res.hint;
+            if (res.code) msg += " | code: " + res.code;
+            console.error("Backend Error:", res);
+            throw new Error(msg);
+          }
+          return res?.data;
+        })();
     if (cacheable) inFlight.set(key, task);
     const result = await task;
     if (cacheable) {
@@ -116,64 +134,112 @@ export async function api(action, data = {}) {
     if (cacheable) inFlight.delete(key);
   }
 }
-export const rows = (snapshot) =>
-  snapshot.docs.map((s) => ({ ...s.data(), id: s.id }));
 export function watch(col, filters, callback, error, options = {}) {
-  const constraints = filters.map(([field, op, value]) =>
-    where(field, op, value),
-  );
-  if (options.order)
-    constraints.push(orderBy(options.order, options.direction || "desc"));
-  constraints.push(limit(options.limit || 100));
-  return onSnapshot(
-    query(collection(db, col), ...constraints),
-    (s) => callback(rows(s)),
-    error,
-  );
+  const fetchQuery = () => {
+    let q = supabase.from(col).select('*');
+    filters.forEach(([field, op, value]) => {
+      if (op === '==') q = q.eq(field, value);
+      else if (op === '>') q = q.gt(field, value);
+      else if (op === '<') q = q.lt(field, value);
+      else if (op === '>=') q = q.gte(field, value);
+      else if (op === '<=') q = q.lte(field, value);
+      else if (op === 'in') q = q.in(field, value);
+    });
+    if (options.order) q = q.order(options.order, { ascending: options.direction === 'asc' });
+    q = q.limit(options.limit || 100);
+    return q;
+  };
+
+  let channel;
+  let stopped = false;
+  fetchQuery().then(({ data, error: err }) => {
+    if (stopped) return;
+    if (err) {
+      console.error(`watch error on ${col}:`, err);
+      if (!(options.optional && err.code === "PGRST205") && error) error(err);
+      return;
+    }
+    callback(data || []);
+    channel = supabase
+      .channel(`${col}:${JSON.stringify(filters)}:${crypto.randomUUID()}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: col }, () => {
+        fetchQuery().then(({ data: nextData, error: nextError }) => {
+          if (!nextError) callback(nextData || []);
+        });
+      })
+      .subscribe();
+  });
+
+  return () => {
+    stopped = true;
+    if (channel) supabase.removeChannel(channel);
+  };
 }
-export function watchProfile(uid, callback, error) {
-  return onSnapshot(
-    doc(db, "Users", uid),
-    (s) => callback(s.exists() ? { ...s.data(), uid } : null),
-    error,
-  );
+
+export function watchProfile(uid, callback, errorCb) {
+  let stopped = false;
+  const formatUser = (data) =>
+    data ? { ...(data.raw_data || {}), ...data, uid: data.uid || data.id || uid } : null;
+
+  const refresh = async () => {
+    try {
+      const { data, error: err } = await supabase.from('Users').select('*').eq('id', uid).maybeSingle();
+      if (stopped) return;
+      if (err) errorCb?.(err);
+      else callback(formatUser(data));
+    } catch (err) {
+      if (!stopped) errorCb?.(err);
+    }
+  };
+  void refresh();
+
+  const channel = supabase.channel(`Users:${uid}:${crypto.randomUUID()}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'Users', filter: `id=eq.${uid}` }, refresh).subscribe();
+    
+  return () => { stopped = true; supabase.removeChannel(channel); };
 }
+
 export async function uploadImage(file, path) {
   if (
     !["image/jpeg", "image/png", "image/webp"].includes(file?.type) ||
     file.size > 5 * 1024 * 1024
   )
-    throw new Error(
-      "Chỉ nhận ảnh JPG, PNG, WebP tối đa 5 MB. / Images up to 5 MB only.",
-    );
-  const target = ref(storage, `${path}/${crypto.randomUUID()}`);
-  await uploadBytes(target, file, { contentType: file.type });
+    throw new Error("Chỉ nhận ảnh JPG, PNG, WebP tối đa 5 MB. / Images up to 5 MB only.");
+    
+  const fileName = `${path}/${crypto.randomUUID()}`;
+  const { data, error } = await supabase.storage.from('sportspace').upload(fileName, file, { contentType: file.type });
+  if (error) throw error;
+  
+  const { data: urlData } = supabase.storage.from('sportspace').getPublicUrl(fileName);
   return {
-    path: target.fullPath,
-    url: path.startsWith("court_photos/") ? await getDownloadURL(target) : null,
+    path: fileName,
+    url: path.startsWith("court_photos/") ? urlData.publicUrl : null,
   };
 }
+
 export async function openPrivateImage(path) {
-  const blob = await getBlob(ref(storage, path));
-  const url = URL.createObjectURL(blob);
+  const { data, error } = await supabase.storage.from('sportspace').download(path);
+  if (error) throw error;
+  const url = URL.createObjectURL(data);
   const link = document.createElement("a");
   link.href = url;
   link.download = "receipt";
   link.click();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 }
-export const markRead = (id) =>
-  updateDoc(doc(db, "Notifications", id), { read: true });
+
+export const markRead = async (id) => {
+  await supabase.from('Notifications').update({ read: true }).eq('id', id);
+};
+
 export async function markAllRead(notifications) {
-  const batch = writeBatch(db);
-  notifications
-    .filter((n) => !n.read)
-    .forEach((n) =>
-      batch.update(doc(db, "Notifications", n.id), { read: true }),
-    );
-  await batch.commit();
+  const ids = notifications.filter((n) => !n.read).map(n => n.id);
+  if (ids.length > 0) {
+    await supabase.from('Notifications').update({ read: true }).in('id', ids);
+  }
 }
+
 export async function getVenue(id) {
-  const s = await getDoc(doc(db, "Facilities", id));
-  return s.exists() ? { ...s.data(), id: s.id } : null;
+  const { data, error } = await supabase.from('Facilities').select('*').eq('id', id).single();
+  return data || null;
 }

@@ -56,7 +56,7 @@ export default function Header({
             justifyContent: 'center',
             boxShadow: 'var(--shadow-glow)'
           }}>
-            <img src="/logo.jpg" alt="SportSpace Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src="/logo.png" alt="SportSpace Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -225,13 +225,14 @@ export default function Header({
               onClick={onOpenAuth}
               className="btn flex items-center gap-2 transition-all hover:scale-105"
               style={{
-                padding: '8px 18px',
+                padding: '8px 20px',
                 borderRadius: '9999px',
                 backgroundColor: theme === 'dark' ? '#84D175' : '#89B9E6',
                 color: theme === 'dark' ? '#07260F' : '#0E2841',
                 fontWeight: 800,
-                fontSize: '0.85rem',
-                boxShadow: 'var(--shadow-sm)'
+                fontSize: '0.9rem',
+                boxShadow: 'var(--shadow-sm)',
+                whiteSpace: 'nowrap'
               }}
             >
               <User size={16} />

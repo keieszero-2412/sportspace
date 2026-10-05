@@ -54,9 +54,15 @@ export default function HeroSection({
   const [activeNav, setActiveNav] = useState("home"); // 'home' | 'venues' | 'matches' | 'merchant' | 'account'
 
   const [isProvinceDropdownOpen, setIsProvinceDropdownOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState("bottom");
   const provinceDropdownRef = useRef(null);
 
   useEffect(() => {
+    if (isProvinceDropdownOpen && provinceDropdownRef.current) {
+      const rect = provinceDropdownRef.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setDropdownPosition(spaceBelow < 280 ? "top" : "bottom");
+    }
     const handleClickOutside = (event) => {
       if (
         provinceDropdownRef.current &&
@@ -67,7 +73,7 @@ export default function HeroSection({
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [isProvinceDropdownOpen]);
 
   const isDark = theme === "dark";
 
@@ -192,7 +198,7 @@ export default function HeroSection({
                   className="w-full h-full rounded-[14px] flex items-center justify-center transition-colors overflow-hidden"
                   style={{ backgroundColor: isDark ? "#0C2D45" : "#FFFDF7" }}
                 >
-                  <img src="/logo.jpg" alt="SportSpace Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  <img src="/logo.png" alt="SportSpace Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </div>
               </div>
               <div className="flex flex-col">
@@ -266,71 +272,72 @@ export default function HeroSection({
 
             {/* Right: Actions (Theme Toggle, Lang Toggle, User Profile) */}
             <div className="hidden sm:flex items-center gap-3">
-              {/* Utility Group: Lang, Bell, Theme */}
-              <div
-                className="flex items-center p-1 rounded-full shadow-sm transition-colors"
-                style={{
-                  backgroundColor: isDark
-                    ? "rgba(255, 255, 255, 0.08)"
-                    : "rgba(255, 253, 247, 0.6)",
-                  backdropFilter: "blur(8px)",
-                  border: isDark
-                    ? "1px solid rgba(255, 255, 255, 0.1)"
-                    : "1px solid rgba(137, 185, 230, 0.3)",
-                }}
-              >
-                {/* Language Switcher */}
+              {/* Utility Group: Lang, Bell, Theme (Square Buttons) */}
+              <div className="flex items-center gap-2">
+                {/* 1. Language Switcher (Square) */}
                 <button
                   onClick={toggleLang}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full font-bold transition-all hover:bg-black/5 dark:hover:bg-white/10"
+                  className="w-[38px] h-[38px] rounded-xl flex items-center justify-center font-extrabold text-xs transition-all hover:scale-105 active:scale-95 shadow-sm border"
                   style={{
-                    fontSize: "0.82rem",
+                    backgroundColor: isDark
+                      ? "rgba(255, 255, 255, 0.08)"
+                      : "rgba(255, 253, 247, 0.75)",
+                    borderColor: isDark
+                      ? "rgba(255, 255, 255, 0.12)"
+                      : "rgba(137, 185, 230, 0.35)",
                     color: isDark ? "#FFF8D2" : "#31465A",
+                    backdropFilter: "blur(8px)",
+                    letterSpacing: "0.5px",
                   }}
                   title={
                     lang === "vi"
-                      ? "Chuyển sang Tiếng Anh"
-                      : "Switch to Vietnamese"
+                      ? "Chuyển sang Tiếng Anh (EN)"
+                      : "Switch to Vietnamese (VI)"
                   }
                 >
-                  <Globe size={15} />
                   <span>{lang.toUpperCase()}</span>
                 </button>
 
-                <div
-                  className="w-[1px] h-4 mx-1"
-                  style={{
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.15)"
-                      : "rgba(0,0,0,0.1)",
-                  }}
-                />
-
-                {/* Notification Bell */}
+                {/* 2. Notification Bell (Square) */}
                 <button
                   onClick={onOpenNotifications}
-                  className="flex items-center justify-center p-1.5 rounded-full relative transition-all hover:bg-black/5 dark:hover:bg-white/10"
-                  style={{ color: isDark ? "#FFF8D2" : "#31465A" }}
-                  title="Thông báo hệ thống"
+                  className="w-[38px] h-[38px] rounded-xl flex items-center justify-center relative transition-all hover:scale-105 active:scale-95 shadow-sm border"
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(255, 255, 255, 0.08)"
+                      : "rgba(255, 253, 247, 0.75)",
+                    borderColor: isDark
+                      ? "rgba(255, 255, 255, 0.12)"
+                      : "rgba(137, 185, 230, 0.35)",
+                    color: isDark ? "#FFF8D2" : "#31465A",
+                    backdropFilter: "blur(8px)",
+                  }}
+                  title={
+                    lang === "vi"
+                      ? "Thông báo hệ thống"
+                      : "System Notifications"
+                  }
                 >
-                  <Bell size={16} />
+                  <Bell size={17} />
                   {unreadNotificationCount > 0 && (
                     <span
                       style={{
                         position: "absolute",
-                        top: 0,
-                        right: 0,
+                        top: -3,
+                        right: -3,
                         background: "#EF4444",
                         color: "#fff",
-                        fontSize: "0.55rem",
+                        fontSize: "0.6rem",
                         fontWeight: 900,
-                        width: 14,
-                        height: 14,
-                        borderRadius: "50%",
+                        minWidth: 16,
+                        height: 16,
+                        borderRadius: "999px",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
+                        padding: "0 4px",
                         border: `2px solid ${isDark ? "#0C2D45" : "#FFFDF7"}`,
+                        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
                       }}
                     >
                       {unreadNotificationCount}
@@ -338,30 +345,34 @@ export default function HeroSection({
                   )}
                 </button>
 
-                <div
-                  className="w-[1px] h-4 mx-1"
-                  style={{
-                    backgroundColor: isDark
-                      ? "rgba(255,255,255,0.15)"
-                      : "rgba(0,0,0,0.1)",
-                  }}
-                />
-
-                {/* Theme Switcher */}
+                {/* 3. Theme Switcher (Square) */}
                 <button
                   onClick={toggleTheme}
-                  className="flex items-center justify-center p-1.5 rounded-full transition-all hover:bg-black/5 dark:hover:bg-white/10 pr-2.5"
-                  style={{ color: isDark ? "#FFF8D2" : "#31465A" }}
+                  className="w-[38px] h-[38px] rounded-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-sm border"
+                  style={{
+                    backgroundColor: isDark
+                      ? "rgba(255, 255, 255, 0.08)"
+                      : "rgba(255, 253, 247, 0.75)",
+                    borderColor: isDark
+                      ? "rgba(255, 255, 255, 0.12)"
+                      : "rgba(137, 185, 230, 0.35)",
+                    color: isDark ? "#FFF8D2" : "#31465A",
+                    backdropFilter: "blur(8px)",
+                  }}
                   title={
                     isDark
-                      ? "Chuyển sang Chế độ Sáng (Light Mode)"
-                      : "Chuyển sang Chế độ Tối (Dark Mode)"
+                      ? lang === "vi"
+                        ? "Chuyển sang Chế độ Sáng (Light Mode)"
+                        : "Switch to Light Mode"
+                      : lang === "vi"
+                        ? "Chuyển sang Chế độ Tối (Dark Mode)"
+                        : "Switch to Dark Mode"
                   }
                 >
                   {isDark ? (
-                    <Sun size={16} color="#FFF8D2" />
+                    <Sun size={17} color="#FFF8D2" />
                   ) : (
-                    <Moon size={16} />
+                    <Moon size={17} />
                   )}
                 </button>
               </div>
@@ -938,7 +949,7 @@ export default function HeroSection({
                         {/* Dropdown Menu */}
                         {isProvinceDropdownOpen && (
                           <div
-                            className="absolute z-[60] w-full mt-2 rounded-xl shadow-2xl overflow-hidden border animate-fade-in"
+                            className={`absolute z-[60] w-full ${dropdownPosition === "bottom" ? "mt-2" : "mb-2"} rounded-xl shadow-2xl overflow-hidden border animate-fade-in`}
                             style={{
                               backgroundColor: isDark
                                 ? "rgba(12, 45, 69, 0.95)"
@@ -948,7 +959,8 @@ export default function HeroSection({
                               borderColor: isDark
                                 ? "rgba(62, 91, 163, 0.6)"
                                 : "rgba(137, 185, 230, 0.5)",
-                              top: "100%",
+                              top: dropdownPosition === "bottom" ? "100%" : "auto",
+                              bottom: dropdownPosition === "top" ? "100%" : "auto",
                             }}
                           >
                             <div

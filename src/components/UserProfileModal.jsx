@@ -26,20 +26,22 @@ import {
 } from "lucide-react";
 import { useToast } from "./ToastContext";
 import ConfirmModal from "./ConfirmModal";
-import { db } from "../firebase";
-import { api, watch } from "../services/api";
-import { auth } from "../firebase";
-import {
-  EmailAuthProvider,
-  reauthenticateWithCredential,
-  reauthenticateWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  sendEmailVerification,
-} from "firebase/auth";
+import { supabase } from "../supabase";
+import { api } from "../services/api";
+import { fetchProfileRecords, watchProfileRecords } from "../services/profileData";
 import { bookingLabel } from "../../functions/domain";
 import MerchantApplicationForm from "./MerchantApplicationForm";
 import AsyncStatus from "./AsyncStatus";
+
+const profileFormData = (profile, lang) => ({
+  name: String(profile?.name || "Khách truy cập"),
+  email: profile?.email || "",
+  phone: profile?.phone || "",
+  province: profile?.province || "Hà Nội",
+  skillLevel: profile?.skillLevel || "Mới bắt đầu (Beginner)",
+  favoriteSports: profile?.favoriteSports || [],
+  preferredLanguage: profile?.preferredLanguage || lang,
+});
 
 export default function UserProfileModal({
   userProfile,
@@ -56,8 +58,7 @@ export default function UserProfileModal({
   const { showSuccess, showInfo, showError } = useToast();
   const [applying, setApplying] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [dataError, setDataError] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [sectionState, setSectionState] = useState({});
   const [password, setPassword] = useState("");
   const [retry, setRetry] = useState(0);
   const [events, setEvents] = useState([]);
@@ -67,15 +68,11 @@ export default function UserProfileModal({
 
   // Profile edit form
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState({
-    name: String(userProfile?.name || "Khách truy cập"),
-    email: userProfile?.email || "",
-    phone: userProfile?.phone || "",
-    province: userProfile?.province || "Hà Nội",
-    skillLevel: userProfile?.skillLevel || "Mới bắt đầu (Beginner)",
-    favoriteSports: userProfile?.favoriteSports || [],
-    preferredLanguage: userProfile?.preferredLanguage || lang,
-  });
+  const [formData, setFormData] = useState(() => profileFormData(userProfile, lang));
+
+  React.useEffect(() => {
+    if (!isEditing) setFormData(profileFormData(userProfile, lang));
+  }, [userProfile, lang, isEditing]);
 
   const [recentBookings, setRecentBookings] = useState([]);
   const [olderBookings, setOlderBookings] = useState([]),
@@ -88,11 +85,11 @@ export default function UserProfileModal({
     if (busy || !userBookings.length) return;
     setBusy(true);
     try {
-      const page = await api("listBookings", {
-        cursor: userBookings.at(-1).id,
+      const rows = await fetchProfileRecords(supabase, "bookings", userProfile.uid, {
+        before: userBookings.at(-1), limit: 100,
       });
-      setOlderBookings((prev) => [...prev, ...page.items]);
-      setHasOlder(page.hasMore);
+      setOlderBookings((prev) => [...prev, ...rows]);
+      setHasOlder(rows.length === 100);
     } catch (e) {
       showError(e.message);
     } finally {
@@ -100,33 +97,30 @@ export default function UserProfileModal({
     }
   }
 
+  const [joinedMatches, setJoinedMatches] = useState([]);
   React.useEffect(() => {
-    if (!userProfile?.uid) return;
-    setLoading(true);
-    setDataError(null);
-    return watch(
-      "Bookings",
-      [["userId", "==", userProfile.uid]],
-      (v) => {
-        setRecentBookings(v);
-        setLoading(false);
-      },
-      (e) => {
-        setDataError(e);
-        setLoading(false);
-      },
-      { order: "createdAt", limit: 100 },
-    );
-  }, [userProfile?.uid, retry]);
-  React.useEffect(() => {
-    if (!userProfile?.uid) return;
-    return watch(
-      "CredibilityEvents",
-      [["userId", "==", userProfile.uid]],
-      setEvents,
-      (e) => setDataError(e),
-    );
+    setRecentBookings([]);
+    setOlderBookings([]);
+    setJoinedMatches([]);
+    setEvents([]);
+    setHasOlder(true);
+    setSectionState({});
   }, [userProfile?.uid]);
+
+  React.useEffect(() => {
+    if (!userProfile?.uid || !["bookings", "matches", "credibility"].includes(tab)) return;
+    setSectionState(previous => ({ ...previous, [tab]: { loading: true, error: null } }));
+    return watchProfileRecords(supabase, tab, userProfile.uid, rows => {
+      if (tab === "bookings") {
+        setRecentBookings(rows);
+        setHasOlder(rows.length === 100);
+      } else if (tab === "matches") setJoinedMatches(rows);
+      else setEvents(rows);
+      setSectionState(previous => ({ ...previous, [tab]: { loading: false, error: null } }));
+    }, error => {
+      setSectionState(previous => ({ ...previous, [tab]: { loading: false, error } }));
+    }, { limit: 100 });
+  }, [userProfile?.uid, tab, retry]);
   // Cancel booking handler with custom ConfirmModal & Toast (Rule 1.2)
   const handleRequestCancel = (bookingId) => {
     setPendingCancelId(bookingId);
@@ -152,24 +146,15 @@ export default function UserProfileModal({
       setBusy(false);
     }
   };
-  const [joinedMatches, setJoinedMatches] = useState([]);
-
-  React.useEffect(() => {
-    if (!userProfile?.uid) return;
-    return watch(
-      "Matches",
-      [["joinedUsers", "array-contains", userProfile.uid]],
-      setJoinedMatches,
-      (e) => setDataError(e),
-      { order: "createdAt", limit: 100 },
-    );
-  }, [userProfile?.uid]);
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
     try {
-      await api("saveProfile", formData);
+      const savedProfile = await api("saveProfile", formData);
+      setUserProfile((previous) => ({ ...previous, ...savedProfile }));
+      setFormData(profileFormData(savedProfile, lang));
+      setIsEditing(false);
       showSuccess(lang === "vi" ? "Đã lưu hồ sơ." : "Profile saved.");
     } catch (e) {
       showError(e.message);
@@ -181,16 +166,16 @@ export default function UserProfileModal({
     if (busy) return;
     setBusy(true);
     try {
-      const user = auth.currentUser;
-      if (user.providerData.some((p) => p.providerId === "password"))
-        await reauthenticateWithCredential(
-          user,
-          EmailAuthProvider.credential(user.email, password),
-        );
-      else await reauthenticateWithPopup(user, new GoogleAuthProvider());
-      await user.getIdToken(true);
-      await api("deleteAccount");
-      await signOut(auth);
+      if (password) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: userProfile.email || "",
+          password
+        });
+        if (error) throw error;
+      }
+      
+      await api("deleteAccount", { password });
+      await supabase.auth.signOut();
       onClose();
       showSuccess(lang === "vi" ? "Đã xóa tài khoản." : "Account deleted.");
     } catch (e) {
@@ -202,26 +187,11 @@ export default function UserProfileModal({
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
-        className="modal-content"
+        className="modal-content profile-modal"
         onClick={(e) => e.stopPropagation()}
-        style={{
-          maxWidth: "680px",
-          width: "100%",
-          height: "85vh",
-          display: "flex",
-          flexDirection: "column",
-          padding: "24px",
-        }}
       >
         {/* Header with Avatar & User Info */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
-            marginBottom: 20,
-          }}
-        >
+        <div className="profile-header">
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div
               style={{
@@ -281,7 +251,20 @@ export default function UserProfileModal({
             </div>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="profile-actions">
+            <button
+              type="button"
+              onClick={() => setTab("credibility")}
+              className={`profile-score ${tab === "credibility" ? "is-active" : ""}`}
+              title={lang === "vi" ? "Xem điểm uy tín" : "View credibility score"}
+            >
+              <ShieldCheck size={16} />
+              <span className="profile-score-label">
+                {lang === "vi" ? "Uy tín" : "Score"}
+              </span>
+              <strong>{userProfile?.credibilityScore ?? 0}</strong>
+              <small>/100</small>
+            </button>
             {userProfile?.role === "merchant" ? (
               <button
                 onClick={() => {
@@ -289,7 +272,6 @@ export default function UserProfileModal({
                   onSwitchToMerchant();
                 }}
                 className="btn btn-secondary"
-                style={{ fontSize: "0.78rem", padding: "6px 12px" }}
                 title={
                   lang === "vi"
                     ? "Chuyển sang Quản trị viên Chủ sân"
@@ -308,10 +290,7 @@ export default function UserProfileModal({
                 }}
                 className="btn"
                 style={{
-                  fontSize: "0.78rem",
-                  padding: "6px 12px",
-                  background:
-                    "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
+                  background: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
                   color: "#FFF",
                   border: "none",
                 }}
@@ -344,12 +323,12 @@ export default function UserProfileModal({
                   setBusy(false);
                 }
               }}
-              className="btn btn-outline"
+              className="btn"
               style={{
-                fontSize: "0.78rem",
-                padding: "6px 12px",
-                color: "#DC2626",
-                borderColor: "#DC2626",
+                background: "rgba(239, 68, 68, 0.1)",
+                color: "#EF4444",
+                border: "1px solid rgba(239, 68, 68, 0.3)",
+                whiteSpace: "nowrap"
               }}
               title={lang === "vi" ? "Đăng xuất" : "Log Out"}
             >
@@ -360,86 +339,16 @@ export default function UserProfileModal({
             <button
               aria-label={lang === "vi" ? "Đóng hồ sơ" : "Close profile"}
               onClick={onClose}
-              className="btn btn-outline"
-              style={{ padding: "6px", borderRadius: "50%" }}
+              className="btn btn-outline profile-close"
             >
-              <X size={18} />
+              <X size={20} />
             </button>
-          </div>
-        </div>
-
-        {/* Credibility Score Box (Core Mechanism from README 4.1) */}
-        <div
-          onClick={() => setTab("credibility")}
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(34, 197, 94, 0.12) 0%, rgba(132, 209, 117, 0.22) 100%)",
-            borderRadius: "16px",
-            padding: "16px 20px",
-            border: "1px solid rgba(34, 197, 94, 0.35)",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: 20,
-            cursor: "pointer",
-            transition: "transform 0.2s ease",
-          }}
-          onMouseEnter={(e) =>
-            (e.currentTarget.style.transform = "translateY(-2px)")
-          }
-          onMouseLeave={(e) =>
-            (e.currentTarget.style.transform = "translateY(0)")
-          }
-        >
-          <div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 6,
-                color: "#16A34A",
-                fontWeight: 800,
-                fontSize: "0.88rem",
-              }}
-            >
-              <ShieldCheck size={20} />
-              <span>
-                {lang === "vi"
-                  ? "HỆ THỐNG ĐIỂM UY TÍN (CREDIBILITY SCORE)"
-                  : "CREDIBILITY SCORE SYSTEM"}
-              </span>
-            </div>
-            <div
-              style={{
-                fontSize: "0.8rem",
-                color: "var(--text-muted)",
-                marginTop: 3,
-              }}
-            >
-              {lang === "vi"
-                ? "Điểm được ghi nhận theo tham dự và hoàn tất đã xác minh."
-                : "Scores reflect verified attendance and completion."}
-            </div>
-          </div>
-          <div style={{ textAlign: "right" }}>
-            <div
-              style={{
-                fontSize: "2.1rem",
-                fontWeight: 900,
-                color: "#16A34A",
-                lineHeight: 1,
-              }}
-            >
-              {userProfile?.credibilityScore ?? 0}
-            </div>
-            <div style={{ fontSize: "0.7rem", color: "var(--text-muted)" }}>
-              {lang === "vi" ? "/ 100 Điểm" : "/ 100 Pts"}
-            </div>
           </div>
         </div>
 
         {/* Tabs Navigation */}
         <div
+          className="profile-tabs"
           style={{
             display: "flex",
             gap: 8,
@@ -931,6 +840,7 @@ export default function UserProfileModal({
             <form
               className="booking-flow"
               onSubmit={handleSaveProfile}
+              onChange={() => setIsEditing(true)}
               style={{ display: "flex", flexDirection: "column", gap: 12 }}
             >
               <label>
@@ -1201,8 +1111,13 @@ export default function UserProfileModal({
           </button>
         )}
         <AsyncStatus
-          loading={loading}
-          error={dataError}
+          loading={sectionState[tab]?.loading}
+          error={sectionState[tab]?.error}
+          empty={!sectionState[tab]?.loading && !sectionState[tab]?.error && (
+            (tab === "bookings" && userBookings.length === 0) ||
+            (tab === "matches" && joinedMatches.length === 0) ||
+            (tab === "credibility" && events.length === 0)
+          )}
           retry={() => setRetry((v) => v + 1)}
           lang={lang}
         />
@@ -1212,24 +1127,6 @@ export default function UserProfileModal({
             lang={lang}
             onClose={() => setApplying(false)}
           />
-        )}
-        {!auth.currentUser?.emailVerified && (
-          <button
-            className="btn btn-outline"
-            onClick={() =>
-              sendEmailVerification(auth.currentUser)
-                .then(() =>
-                  showInfo(
-                    lang === "vi"
-                      ? "Đã gửi email xác minh."
-                      : "Verification email sent.",
-                  ),
-                )
-                .catch((e) => showError(e.message))
-            }
-          >
-            {lang === "vi" ? "Gửi email xác minh" : "Send verification email"}
-          </button>
         )}
         {/* Custom Confirm Modal replacing native window.confirm (Rule 1.2) */}
         <ConfirmModal
@@ -1274,9 +1171,7 @@ export default function UserProfileModal({
             setPassword("");
           }}
         >
-          {auth.currentUser?.providerData.some(
-            (p) => p.providerId === "password",
-          ) && (
+          {true && (
             <label className="booking-flow">
               {lang === "vi"
                 ? "Mật khẩu để xác thực xóa tài khoản"

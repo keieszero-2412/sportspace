@@ -43,19 +43,21 @@ export default function MatchmakingSection({
     setError(null);
     return watch(
       "Matches",
-      [
-        ["status", "==", "open"],
-        ["startAt", ">", Date.now()],
-      ],
+      [],
       (v) => {
-        setMatches(v);
+        const now = Date.now();
+        const filtered = v
+          .map(m => ({ ...m, ...(m.raw_data || {}) }))
+          .filter(m => m.status === "open" && m.startAt > now)
+          .sort((a, b) => a.startAt - b.startAt);
+        setMatches(filtered);
         setLoading(false);
       },
       (e) => {
         setError(e);
         setLoading(false);
       },
-      { order: "startAt", direction: "asc", limit: 100 },
+      { limit: 1000 },
     );
   }, [retry]);
   async function create(e) {

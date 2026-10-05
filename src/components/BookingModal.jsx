@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { X, Copy, Download } from "lucide-react";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "../firebase";
+import { supabase } from "../supabase";
 import { api, watch, uploadImage } from "../services/api";
 import {
   localDate,
@@ -67,29 +66,51 @@ export default function BookingModal({
         setError(e);
         setLoading(false);
       };
+    let s2 = () => {};
     const s1 = watch(
       "Courts",
       [["facility_id", "==", venue.facility_id || venue.id]],
       (v) => {
-        setCourts(v.filter((c) => c.status === "active" || c.status === "Đang hoạt động" || c.is_available === true).map(c => ({...c, basePrice: c.basePrice || c.price_day || c.price_night || 100000})));
+        const activeCourts = v
+          .map((court) => ({ ...(court.raw_data || {}), ...court }))
+          .filter((c) => c.status === "active" || c.status === "Đang hoạt động" || c.is_available === true)
+          .map((c) => ({ ...c, basePrice: c.basePrice || c.price_day || c.price_night || 100000 }));
+        setCourts(activeCourts);
         a = true;
-        loaded();
+        s2();
+        if (!activeCourts.length) {
+          setAvailability([]);
+          b = true;
+          loaded();
+          return;
+        }
+        s2 = watch(
+          "Availability",
+          [
+            ["court_id", "in", activeCourts.map((court) => court.id)],
+            ["date", "==", date],
+          ],
+          (rows) => {
+            setAvailability(rows.map((value) => {
+              const item = { ...(value.raw_data || {}), ...value };
+              const startAt = Number(item.startAt) || Date.parse(`${item.date}T${item.start_time || "00:00"}:00+07:00`);
+              const endAt = Number(item.endAt) || Date.parse(`${item.date}T${item.end_time || item.start_time || "00:00"}:00+07:00`);
+              return {
+                ...item,
+                courtId: item.courtId || item.court_id,
+                startAt,
+                endAt,
+                expiresAt: Number(item.expiresAt) || null,
+              };
+            }));
+            b = true;
+            loaded();
+          },
+          fail,
+          { limit: 500 },
+        );
       },
       fail,
-    );
-    const s2 = watch(
-      "Availability",
-      [
-        ["facilityId", "==", venue.id],
-        ["date", "==", date],
-      ],
-      (v) => {
-        setAvailability(v);
-        b = true;
-        loaded();
-      },
-      fail,
-      { limit: 500 },
     );
     return () => {
       s1();
@@ -104,20 +125,25 @@ export default function BookingModal({
   }, [storageKey]);
   useEffect(() => {
     if (!trackedId) return;
-    return onSnapshot(
-      doc(db, "Bookings", trackedId),
-      (s) => {
-        if (s.exists() && s.data().userId === userProfile?.uid) {
-          setBooking({ ...s.data(), id: s.id });
-          setStep("payment");
-        } else {
-          sessionStorage.removeItem(storageKey);
-          setTrackedId(null);
-        }
-      },
-      (e) => showError(e.message),
-    );
-  }, [trackedId, storageKey]);
+    let channel;
+    const fetchBooking = async () => {
+      const { data } = await supabase.from("Bookings").select("*").eq("id", trackedId).single();
+      if (data && data.userId === userProfile?.uid) {
+        setBooking(data);
+        setStep("payment");
+      } else {
+        sessionStorage.removeItem(storageKey);
+        setTrackedId(null);
+      }
+    };
+    fetchBooking();
+    
+    channel = supabase.channel(`public:Bookings:id=eq.${trackedId}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'Bookings', filter: `id=eq.${trackedId}` }, fetchBooking)
+      .subscribe();
+      
+    return () => supabase.removeChannel(channel);
+  }, [trackedId, storageKey, userProfile?.uid]);
   const chosen = courts.find((c) => c.id === courtId);
   const slots = useMemo(() => {
     try {
@@ -152,11 +178,12 @@ export default function BookingModal({
     const r = slotIntervals[time];
     if (!r) return "locked";
     if (r.startAt <= clock) return "locked";
-    if (
-      availability.some(
-        (a) => a.courtId === c.id && a.expiresAt > clock && overlaps(a, r),
-      )
-    )
+    if (availability.some((a) => {
+      const active = a.expiresAt
+        ? a.expiresAt > clock
+        : !["available", "expired", "cancelled"].includes(String(a.status || "").toLowerCase());
+      return a.courtId === c.id && active && Number.isFinite(a.startAt) && Number.isFinite(a.endAt) && overlaps(a, r);
+    }))
       return "booked";
     return "available";
   }
@@ -320,7 +347,7 @@ export default function BookingModal({
                 />
               </label>
               <label>
-                {tr("Thời lượng mỗi ô", "Duration per slot")}
+                {tr("Thời lượng", "Duration")}
                 <select
                   value={duration}
                   onChange={(e) => {
@@ -368,7 +395,7 @@ export default function BookingModal({
                        {tr("Đã đặt", "Booked")}
                      </span>
                      <span style={{display: 'flex', alignItems: 'center', gap: 4}}>
-                       <div style={{width: 16, height: 16, background: 'var(--bg-secondary)', borderRadius: 2}}></div> 
+                       <div style={{width: 16, height: 16, background: '#cbd5e1', borderRadius: 2}}></div> 
                        {tr("Khóa", "Locked")}
                      </span>
                   </div>
@@ -384,7 +411,7 @@ export default function BookingModal({
                   <table className="court-timetable" style={{ width: '100%', borderCollapse: 'collapse' }}>
                     <thead>
                       <tr>
-                        <th style={{ padding: 8, minWidth: 80 }}>{tr("Sân", "Court")}</th>
+                        <th style={{ padding: 8, minWidth: 80, position: 'sticky', left: 0, background: 'var(--bg-primary)', zIndex: 10, borderRight: '1px solid var(--surface-card-border)' }}>{tr("Sân", "Court")}</th>
                         {slots.map((t) => (
                           <th key={t} style={{ padding: 8, minWidth: 48, fontSize: '0.9rem' }}>{t}</th>
                         ))}
@@ -393,7 +420,7 @@ export default function BookingModal({
                     <tbody>
                       {courts.map((c) => (
                         <tr key={c.id}>
-                          <th style={{ padding: 8, whiteSpace: 'nowrap', fontSize: '0.9rem' }}>
+                          <th style={{ padding: 8, whiteSpace: 'nowrap', fontSize: '0.9rem', position: 'sticky', left: 0, background: 'var(--bg-primary)', zIndex: 10, borderRight: '1px solid var(--surface-card-border)' }}>
                             {c.name || c.court_name || "Sân"}
                           </th>
                           {slots.map((t) => {
@@ -418,9 +445,9 @@ export default function BookingModal({
                                       : state === "available" 
                                         ? "transparent" 
                                         : state === "booked"
-                                          ? "#ef4444"
-                                          : "var(--bg-secondary)",
-                                    opacity: state === "available" || selected || state === "booked" ? 1 : 0.6,
+                                      ? "#ef4444"
+                                      : "#cbd5e1",
+                                    opacity: 1,
                                     padding: 0,
                                     transition: "all 0.2s"
                                   }}

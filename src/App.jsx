@@ -13,10 +13,11 @@ const MerchantDashboard = React.lazy(
 import UserProfileModal from "./components/UserProfileModal";
 import NotificationModal from "./components/NotificationModal";
 import AuthModal from "./components/AuthModal";
+import PasswordRecoveryModal from "./components/PasswordRecoveryModal";
 import ErrorBoundary from "./components/ErrorBoundary";
 import InfoModal from "./components/InfoModal";
 
-import { db, auth } from "./firebase";
+import { supabase } from "./supabase";
 import {
   api,
   cachedApi,
@@ -29,7 +30,7 @@ import AsyncStatus from "./components/AsyncStatus";
 import { getCurrentPosition } from "./utils/geo";
 const AdminPanel = React.lazy(() => import("./components/AdminPanel"));
 import { useToast } from "./components/ToastContext";
-import { onAuthStateChanged, signOut, getRedirectResult } from "firebase/auth";
+import { consumeAuthError, profileForUser } from "./services/auth";
 
 export default function App() {
   const { t, i18n } = useTranslation();
@@ -72,68 +73,90 @@ export default function App() {
 
   const [authLoading, setAuthLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
+  const [authUser, setAuthUser] = useState(null);
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
+
   useEffect(() => {
-    let generation = 0,
-      stopProfile = () => {};
-    getRedirectResult(auth).catch((e) => showError(e.message));
-    const stopAuth = onAuthStateChanged(auth, async (user) => {
-      const current = ++generation;
-      stopProfile();
-      setUserProfile(null);
-      setShowProfile(false);
-      setShowNotifications(false);
-      setAuthLoading(true);
-      setNotifications([]);
-      setSavedVenueIds([]);
-      setSavedVenues([]);
-      if (!user) {
-        setAuthLoading(false);
-        setCurrentTab("explore");
-        return;
-      }
-      try {
-        let draft = {};
-        try {
-          draft = JSON.parse(
-            sessionStorage.getItem("registrationDraft") || "{}",
-          );
-        } catch {
-          /* invalid draft */
-        }
-        const profile = await api("saveProfile", {
-          name: user.displayName || user.email?.split("@")[0] || "",
-          ...draft,
-          initializeOnly: true,
-        });
-        const token = await user.getIdTokenResult();
-        if (current !== generation) return;
-        sessionStorage.removeItem("registrationDraft");
-        setUserProfile({ ...profile, isAdmin: token.claims.admin === true });
-        if (["vi", "en"].includes(profile.preferredLanguage))
-          setLang(profile.preferredLanguage);
-        stopProfile = watchProfile(
-          user.uid,
-          (p) => {
-            if (current !== generation) return;
-            setUserProfile(
-              p ? { ...p, isAdmin: token.claims.admin === true } : null,
-            );
-            setSavedVenueIds(p?.savedVenueIds || []);
-          },
-          showError,
-        );
-      } catch (e) {
-        if (current === generation) showError(e.message);
-      } finally {
-        if (current === generation) setAuthLoading(false);
-      }
+    let active = true;
+    let revision = 0;
+    const receiveSession = (session, event) => {
+      if (!active) return;
+      const next = session?.user || null;
+      setAuthUser((previous) =>
+        previous?.id === next?.id && event !== "USER_UPDATED" ? previous : next,
+      );
+      setAuthLoading(false);
+    };
+    const callbackError = consumeAuthError();
+    if (callbackError) showError(callbackError);
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      revision++;
+      if (event === "PASSWORD_RECOVERY") setPasswordRecovery(true);
+      if (event === "SIGNED_OUT") setPasswordRecovery(false);
+      receiveSession(session, event);
+    });
+    const initialRevision = revision;
+    supabase.auth.getSession().then(({ data, error }) => {
+      if (!active || revision !== initialRevision) return;
+      if (error) throw error;
+      receiveSession(data.session, "INITIAL_SESSION");
+    }).catch((error) => {
+      if (!active || revision !== initialRevision) return;
+      showError(error.message);
+      setAuthLoading(false);
     });
     return () => {
-      generation++;
-      stopAuth();
-      stopProfile();
+      active = false;
+      data.subscription.unsubscribe();
     };
   }, [showError]);
+
+  useEffect(() => {
+    let active = true;
+    let stopProfile = () => {};
+    setShowProfile(false);
+    setShowNotifications(false);
+    setNotifications([]);
+    setSavedVenueIds([]);
+    setSavedVenues([]);
+    if (!authUser) {
+      setUserProfile(null);
+      setCurrentTab("explore");
+      return;
+    }
+    let currentProfile = profileForUser(authUser);
+    setUserProfile(currentProfile);
+    const publishProfile = (row) => {
+      if (!active) return;
+      currentProfile = profileForUser(authUser, row || currentProfile);
+      setUserProfile(currentProfile);
+      setSavedVenueIds(currentProfile.savedVenueIds);
+      if (["vi", "en"].includes(currentProfile.preferredLanguage))
+        setLang(currentProfile.preferredLanguage);
+    };
+    const loadProfile = async () => {
+      try {
+        const profile = await api("saveProfile", {
+          name: currentProfile.name,
+          phone: currentProfile.phone,
+          initializeOnly: true,
+        });
+        publishProfile(profile);
+      } catch (error) {
+        if (active)
+          showError(`Đã đăng nhập, nhưng chưa tải được hồ sơ. / Signed in, but your profile could not be loaded. ${error.message}`);
+      }
+      if (!active) return;
+      stopProfile = watchProfile(authUser.id, publishProfile, (error) => {
+        if (active) showError(error.message);
+      });
+    };
+    void loadProfile();
+    return () => {
+      active = false;
+      stopProfile();
+    };
+  }, [authUser, showError]);
 
   // Search & Filters (README 4.1)
   const [searchQuery, setSearchQuery] = useState("");
@@ -961,7 +984,7 @@ export default function App() {
             }}
             onSwitchToMerchant={() => setCurrentTab("merchant")}
             onLogout={async () => {
-              await signOut(auth);
+              await supabase.auth.signOut();
               setShowProfile(false);
               setUserProfile(null);
               setCurrentTab("explore");
@@ -989,6 +1012,15 @@ export default function App() {
             onClose={() => setShowAuth(false)}
             onLoginSuccess={() => {}}
             lang={lang}
+          />
+        </ErrorBoundary>
+      )}
+
+      {passwordRecovery && (
+        <ErrorBoundary title="PasswordRecoveryModal">
+          <PasswordRecoveryModal
+            lang={lang}
+            onClose={() => setPasswordRecovery(false)}
           />
         </ErrorBoundary>
       )}

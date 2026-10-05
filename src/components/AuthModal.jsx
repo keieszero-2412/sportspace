@@ -12,21 +12,30 @@ import {
   Building,
   Trophy,
 } from "lucide-react";
-import {
-  auth,
-  googleProvider,
-  signInWithPopup,
-  signInWithRedirect,
-} from "../firebase";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
-  sendPasswordResetEmail,
-  sendEmailVerification,
-} from "firebase/auth";
+import { supabase } from "../supabase";
 import { api, uploadImage } from "../services/api";
+import { authRedirectUrl } from "../services/auth";
 import { useToast } from "./ToastContext";
+
+function authMessage(error, lang) {
+  const code = error?.code || "";
+  if (code === "invalid_credentials") {
+    return lang === "vi"
+      ? "Email hoặc mật khẩu không đúng. Nếu tài khoản được tạo bằng Google, hãy chọn nút Google thay vì nhập mật khẩu."
+      : "The email or password is incorrect. If this account was created with Google, use the Google button instead of a password.";
+  }
+  if (code === "email_not_confirmed") {
+    return lang === "vi"
+      ? "Email chưa được xác thực. Hãy kiểm tra hộp thư rồi đăng nhập lại."
+      : "Your email is not verified. Check your inbox and try again.";
+  }
+  if (code === "user_already_exists") {
+    return lang === "vi"
+      ? "Email này đã có tài khoản. Hãy chuyển sang Đăng nhập."
+      : "This email already has an account. Switch to Sign In.";
+  }
+  return error?.message || (lang === "vi" ? "Đăng nhập thất bại." : "Sign in failed.");
+}
 
 export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
   const { showError, showInfo, showSuccess } = useToast();
@@ -74,54 +83,55 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSubmitting) return;
-    if (!isLogin)
-      sessionStorage.setItem(
-        "registrationDraft",
-        JSON.stringify({ name: formData.name, phone: formData.phone }),
-      );
+    if (isSubmitting || isGoogleLoading) return;
     setIsSubmitting(true);
 
     try {
-      let userCredential;
+      let user, error, session;
       if (isLogin) {
-        // Đăng nhập thật bằng Firebase
-        userCredential = await signInWithEmailAndPassword(
-          auth,
-          formData.email,
-          formData.password,
-        );
+        // Đăng nhập bằng Supabase
+        const { data, error: signInError } = await supabase.auth.signInWithPassword({
+          email: formData.email.trim(),
+          password: formData.password,
+        });
+        user = data?.user;
+        session = data?.session;
+        error = signInError;
       } else {
-        // Đăng ký thật bằng Firebase
-        if (auth.currentUser?.email === formData.email)
-          userCredential = { user: auth.currentUser };
-        else
-          userCredential = await createUserWithEmailAndPassword(
-            auth,
-            formData.email,
-            formData.password,
-          );
+        // Đăng ký bằng Supabase
+        const { data, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email.trim(),
+          password: formData.password,
+          options: {
+            emailRedirectTo: authRedirectUrl(),
+            data: {
+              name: formData.name,
+              phone: formData.phone
+            }
+          }
+        });
+        user = data?.user;
+        session = data?.session;
+        error = signUpError;
       }
 
-      const user = userCredential.user;
-      if (!isLogin) {
-        await updateProfile(user, { displayName: formData.name });
-        await api("saveProfile", {
-          name: formData.name,
-          phone: formData.phone,
-        });
-        if (!user.emailVerified)
-          await sendEmailVerification(user).catch(() =>
-            showInfo(
-              lang === "vi"
-                ? "Bạn có thể gửi lại email xác minh trong hồ sơ."
-                : "Resend verification from your profile.",
-            ),
-          );
+      if (error) throw error;
+
+      if (!isLogin && user) {
+        if (!session) {
+          showInfo(lang === "vi" ? "Vui lòng kiểm tra email để xác thực tài khoản." : "Check your email to confirm your account.");
+          if (isMerchant) {
+            showError("Vui lòng xác thực email rồi đăng nhập lại để tiếp tục đăng ký sân.");
+          }
+          onClose();
+          return;
+        }
+
         if (isMerchant) {
+          try {
           const documents = await Promise.all(
             Object.values(files).map((file) =>
-              uploadImage(file, `merchant_documents/${user.uid}`),
+              uploadImage(file, `merchant_documents/${user.id}`),
             ),
           );
           await api("applyMerchant", {
@@ -134,32 +144,43 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
               ? "Hồ sơ chủ sân đang chờ duyệt."
               : "Merchant application is awaiting approval.",
           );
+          } catch (error) {
+            showError(lang === "vi"
+              ? `Tài khoản đã được tạo và đăng nhập, nhưng chưa gửi được hồ sơ chủ sân. Hãy thử lại trong Hồ sơ. ${error.message}`
+              : `Your account is created and signed in, but the merchant application failed. Retry from Profile. ${error.message}`);
+          }
         }
-        sessionStorage.removeItem("registrationDraft");
       }
+      if (!user || !session) throw new Error(lang === "vi" ? "Chưa nhận được phiên đăng nhập. Vui lòng thử lại." : "No sign-in session was returned. Please try again.");
       onLoginSuccess();
       onClose();
     } catch (error) {
       console.error("Auth Error:", error);
-      showError(error.message);
+      showError(authMessage(error, lang));
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleGoogleLogin = async () => {
+    if (isSubmitting || isGoogleLoading) return;
     setIsGoogleLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
-      onLoginSuccess();
-      onClose();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: authRedirectUrl(),
+        }
+      });
+      if (error) throw error;
     } catch (error) {
       console.error("Google Sign In Error:", error);
-      if (error.code === "auth/popup-blocked") {
-        await signInWithRedirect(auth, googleProvider);
-        return;
-      }
-      showError(error.message);
+      showError(
+        error.message ||
+          (lang === "vi"
+            ? "Không thể kết nối Google. Vui lòng thử lại."
+            : "Could not connect to Google. Please try again."),
+      );
       setIsGoogleLoading(false);
     }
   };
@@ -167,26 +188,16 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
   const isDark = theme === "dark";
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center animate-fade-in px-4">
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 backdrop-blur-md transition-colors"
-        style={{
-          backgroundColor: isDark
-            ? "rgba(12, 45, 69, 0.8)"
-            : "rgba(49, 70, 90, 0.6)",
-        }}
-        onClick={onClose}
-      />
-
+    <div className="modal-overlay" onClick={onClose}>
       {/* Modal Content */}
       <div
-        className="relative w-full max-w-md flex flex-col animate-slide-up shadow-2xl"
+        className="modal-content"
+        onClick={(e) => e.stopPropagation()}
         style={{
-          backgroundColor: isDark ? "#1C3144" : "#FFFDF7",
-          borderRadius: "24px",
-          border: `1px solid ${isDark ? "rgba(137, 185, 230, 0.2)" : "rgba(255, 255, 255, 0.8)"}`,
-          maxHeight: "90vh",
+          maxWidth: "450px",
+          padding: 0,
+          display: "flex",
+          flexDirection: "column",
           overflow: "hidden",
         }}
       >
@@ -205,12 +216,16 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center font-black text-xl shadow-lg"
               style={{
-                background: "linear-gradient(135deg, #22C55E 0%, #16A34A 100%)",
-                color: "#FFF",
-                boxShadow: "0 4px 14px rgba(34, 197, 94, 0.3)",
+                backgroundColor: isDark ? "#FFF8D2" : "#FFFDF7",
+                overflow: "hidden",
+                boxShadow: "0 4px 14px rgba(49, 70, 90, 0.2)",
               }}
             >
-              SS
+              <img
+                src="/logo.png"
+                alt="SportSpace Logo"
+                className="w-full h-full object-cover"
+              />
             </div>
             <div className="flex flex-col">
               <span
@@ -230,10 +245,10 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
 
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 rounded-full transition-colors hover:bg-black/10 z-10"
-            style={{ color: isDark ? "#89B9E6" : "#5F7489" }}
+            className="absolute top-4 right-4 btn btn-outline"
+            style={{ padding: "6px", borderRadius: "50%", zIndex: 10, border: "none", background: "transparent" }}
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
@@ -252,7 +267,8 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
                   : isDark
                     ? "#5F7489"
                     : "#8FA4B8",
-                borderBottom: `3px solid ${isLogin ? "#22C55E" : "transparent"}`,
+                borderBottom: `3px solid ${isLogin ? "var(--btn-primary)" : "transparent"}`,
+                whiteSpace: "nowrap"
               }}
             >
               {lang === "vi" ? "Đăng nhập" : "Sign In"}
@@ -268,7 +284,8 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
                   : isDark
                     ? "#5F7489"
                     : "#8FA4B8",
-                borderBottom: `3px solid ${!isLogin ? "#22C55E" : "transparent"}`,
+                borderBottom: `3px solid ${!isLogin ? "var(--btn-primary)" : "transparent"}`,
+                whiteSpace: "nowrap"
               }}
             >
               {lang === "vi" ? "Đăng ký" : "Sign Up"}
@@ -347,6 +364,7 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
                   <input
                     type="email"
                     name="email"
+                    autoComplete="email"
                     required
                     placeholder={lang === "vi" ? "Email" : "Email address"}
                     value={formData.email}
@@ -373,6 +391,8 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
                   <input
                     type="password"
                     name="password"
+                    autoComplete={isLogin ? "current-password" : "new-password"}
+                    minLength={isLogin ? undefined : 6}
                     required
                     placeholder={lang === "vi" ? "Mật khẩu" : "Password"}
                     value={formData.password}
@@ -679,8 +699,13 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
                 <div className="flex justify-end">
                   <button
                     onClick={async () => {
+                      if (!formData.email.trim()) {
+                        showInfo(lang === "vi" ? "Nhập email trước để nhận liên kết đặt lại mật khẩu." : "Enter your email to receive a reset link.");
+                        return;
+                      }
                       try {
-                        await sendPasswordResetEmail(auth, formData.email);
+                        const { error } = await supabase.auth.resetPasswordForEmail(formData.email.trim(), { redirectTo: authRedirectUrl() });
+                        if (error) throw error;
                         showInfo(
                           lang === "vi"
                             ? "Đã gửi email đặt lại mật khẩu."
@@ -701,12 +726,9 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
 
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3.5 rounded-xl font-bold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-95 disabled:opacity-70 disabled:hover:scale-100 flex items-center justify-center gap-2 mt-2"
-                style={{
-                  background:
-                    "linear-gradient(135deg, #22C55E 0%, #16A34A 100%)",
-                }}
+                disabled={isSubmitting || isGoogleLoading}
+                className="btn btn-primary w-full mt-2 flex items-center justify-center gap-2 py-3"
+                style={{ fontSize: "1rem" }}
               >
                 {isSubmitting ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -748,12 +770,8 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
                   type="button"
                   onClick={handleGoogleLogin}
                   disabled={isGoogleLoading || isSubmitting}
-                  className="flex items-center justify-center gap-2 py-2.5 rounded-xl font-bold transition-all hover:scale-105 shadow-sm disabled:opacity-70 disabled:hover:scale-100"
-                  style={{
-                    backgroundColor: isDark ? "rgba(12, 45, 69, 0.5)" : "#FFF",
-                    border: `1px solid ${isDark ? "#3E5BA3" : "#BCE0F7"}`,
-                    color: isDark ? "#FFF8D2" : "#31465A",
-                  }}
+                  className="btn btn-secondary w-full flex items-center justify-center gap-2 py-3"
+                  style={{ fontSize: "0.95rem" }}
                 >
                   {isGoogleLoading ? (
                     <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />

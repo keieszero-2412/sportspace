@@ -10,7 +10,9 @@ npm.cmd ci --prefix functions
 npm.cmd run dev
 ```
 
-Danh sách sân, bộ lọc thông tin và thống kê công khai đọc trực tiếp Firestore, không cần Cloud Functions. Cache trình duyệt giữ trang kết quả 5 phút, thống kê/tỉnh thành 15 phút để giảm lượt đọc khi tải lại. Lọc lịch trống, tài khoản và các thao tác ghi vẫn cần callable `sportspace` ở `asia-southeast1`, Rules và indexes trong repository. Backend Firebase production chưa được deploy trong đợt này; xem [hướng dẫn vận hành](docs/VAN_HANH_FIREBASE.md) trước khi mở các luồng giao dịch.
+Danh sách sân, bộ lọc thông tin và thống kê công khai đọc trực tiếp catalogue Supabase, không cần Edge Function. Khi bảng `Facilities` chưa có dữ liệu, frontend dùng catalogue đóng gói trong `src/data/venues.json` để website vẫn hiển thị sân; cần import dữ liệu vào Supabase để dùng dữ liệu production mới nhất. Cache trình duyệt giữ trang kết quả 5 phút, thống kê/tỉnh thành 15 phút để giảm lượt đọc khi tải lại. Lọc lịch trống, tài khoản và các thao tác ghi vẫn cần Edge Function `sportspace`. Backend Firebase production chưa được deploy trong đợt này; xem [hướng dẫn vận hành](docs/VAN_HANH_FIREBASE.md) trước khi mở các luồng giao dịch.
+
+Edge Function `sportspace` cần secret `SUPABASE_DB_URL` trỏ tới Supabase pooler/database URL. Function chỉ mở một kết nối PostgreSQL với timeout ngắn để tránh worker bị giới hạn tài nguyên; sau khi thay đổi `supabase/functions/sportspace`, cần deploy lại function.
 
 Để phát triển cục bộ, chạy Firebase Emulator với project `demo-sportspace`, đặt `$env:VITE_USE_EMULATORS='true'` trong terminal frontend rồi chạy Vite. Không dùng credentials production cho test. Khi bật cờ DEV, toàn bộ Firebase client dùng project demo.
 

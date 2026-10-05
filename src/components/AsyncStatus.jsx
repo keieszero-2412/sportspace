@@ -9,12 +9,12 @@ export default function AsyncStatus({
   if (!loading && !error && !empty) return null;
   const quotaExceeded = error?.code?.endsWith("resource-exhausted");
   const serviceUnavailable =
-    error?.code?.startsWith("functions/") &&
+    ["PGRST205", "42P01", "42703"].includes(error?.code) ||
     [
       "functions/not-found",
       "functions/internal",
       "functions/unavailable",
-    ].includes(error.code);
+    ].includes(error?.code);
   return (
     <div
       role={error ? "alert" : "status"}

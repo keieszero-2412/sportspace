@@ -16,8 +16,6 @@ import {
   Send,
   ThumbsUp,
 } from "lucide-react";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db, auth } from "../firebase";
 import { api, watch } from "../services/api";
 import { useToast } from "./ToastContext";
 import AsyncStatus from "./AsyncStatus";
@@ -55,18 +53,23 @@ export default function VenueDetailModal({
         "Courts",
         [["facility_id", "==", venue.facility_id || venue.id]],
         (v) => {
-          setCourtsList(v.filter((c) => c.status === "active"));
+          setCourtsList(v.map((c) => ({
+            ...(c.raw_data || {}), ...c,
+            name: c.name || c.raw_data?.court_name || c.raw_data?.name,
+            status: c.status || c.raw_data?.status,
+          })).filter((c) => c.status === "active" || c.status === "Đang hoạt động" || c.is_available === true));
           setLoadingCourts(false);
         },
         fail,
       ),
       watch("Reviews", [["facilityId", "==", venue.id]], setReviewsList, fail),
     ];
-    if (auth.currentUser)
-      stop.push(
-        watch(
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const unsubscribe = watch(
           "Bookings",
-          [["userId", "==", auth.currentUser.uid]],
+          [["userId", "==", user.id]],
           (v) =>
             setEligible(
               v.filter(
@@ -74,10 +77,17 @@ export default function VenueDetailModal({
               ),
             ),
           fail,
-        ),
-      );
-    return () => stop.forEach((s) => s());
-  }, [venue.id, auth.currentUser?.uid, retry]);
+        );
+        return unsubscribe;
+      }
+    };
+    let unsubs = [];
+    checkAuth().then(u => { if (u) unsubs.push(u) });
+    return () => {
+      stop.forEach((s) => s());
+      unsubs.forEach((s) => s());
+    };
+  }, [venue.id, retry]);
   const [userRating, setUserRating] = useState(5);
   const [userComment, setUserComment] = useState("");
   const [imageFailed, setImageFailed] = useState(false);

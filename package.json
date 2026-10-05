@@ -7,17 +7,25 @@
     "dev": "vite",
     "build": "vite build",
     "test": "node --test functions/test/*.test.js",
+    "test:auth": "node --test test/auth.test.mjs",
+    "test:profile": "node --test test/profile-data.test.mjs",
+    "test:profile:browser": "node scripts/auth-browser-test.mjs --profile-only",
+    "test:auth:browser": "node scripts/auth-browser-test.mjs",
     "test:emulators": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-emulator-tests.ps1",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
     "canvas-confetti": "^1.9.3",
     "cheerio": "^1.2.0",
     "chrome-launcher": "^1.2.2",
     "clsx": "^2.1.1",
+    "dotenv": "^18.0.5",
     "firebase": "^12.19.0",
+    "firebase-admin": "^14.5.0",
     "i18next": "^26.4.2",
     "lucide-react": "^0.395.0",
+    "postgres": "^3.4.9",
     "puppeteer-core": "^25.12.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
@@ -34,6 +42,7 @@
     "firebase-tools": "^15.32.1",
     "postcss": "^8.5.28",
     "prettier": "^3.9.9",
+    "supabase": "^2.119.0",
     "tailwindcss": "^3.4.19",
     "vite": "^5.3.1"
   }

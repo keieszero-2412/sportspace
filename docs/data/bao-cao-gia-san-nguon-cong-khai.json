@@ -1,0 +1,97 @@
+{
+  "generatedAt": "2026-10-04T15:50:55.284Z",
+  "totalFacilities": 1912,
+  "baselinePricedFacilities": 14,
+  "pricedFacilities": 220,
+  "newPricedFacilities": 206,
+  "coveragePercent": 11.51,
+  "remainingFacilities": 1692,
+  "priceRows": 240,
+  "coverageRows": 1932,
+  "hourlyPricedFacilities": 143,
+  "sourceDomains": [
+    "shopvnb.com",
+    "www.sporta.vn",
+    "thegioithethao.vn",
+    "www.alobo.vn",
+    "diadiem247.com",
+    "vssports.vn",
+    "tuanviet.vn",
+    "pickleballplus.vn",
+    "www.decathlon.vn",
+    "santennisdaikim.org",
+    "tennislocal.app",
+    "quangbinhtoplist.com",
+    "tinphatsports.vn",
+    "thethaothientruong.vn"
+  ],
+  "counts": {
+    "curated_public_price": 220,
+    "no_public_price": 1635,
+    "contact_only": 4,
+    "rejected_non_rental_price": 1,
+    "missing_source_url": 52
+  },
+  "sportCounts": [
+    {
+      "sport": "Pickleball",
+      "total": 340,
+      "withPublicPrice": 170,
+      "withHourlyPrice": 129
+    },
+    {
+      "sport": "Cầu lông",
+      "total": 349,
+      "withPublicPrice": 12,
+      "withHourlyPrice": 7
+    },
+    {
+      "sport": "Bóng đá",
+      "total": 1131,
+      "withPublicPrice": 30,
+      "withHourlyPrice": 1
+    },
+    {
+      "sport": "Tennis",
+      "total": 10,
+      "withPublicPrice": 5,
+      "withHourlyPrice": 2
+    },
+    {
+      "sport": "Bóng rổ",
+      "total": 30,
+      "withPublicPrice": 2,
+      "withHourlyPrice": 2
+    },
+    {
+      "sport": "Thể thao tổng hợp",
+      "total": 2,
+      "withPublicPrice": 0,
+      "withHourlyPrice": 0
+    },
+    {
+      "sport": "Bóng bàn",
+      "total": 32,
+      "withPublicPrice": 0,
+      "withHourlyPrice": 0
+    },
+    {
+      "sport": "Bóng chuyền",
+      "total": 18,
+      "withPublicPrice": 1,
+      "withHourlyPrice": 1
+    }
+  ],
+  "localPagesScanned": 928,
+  "bookingPagesScanned": 1815,
+  "candidateRows": 442,
+  "approvedCandidateRows": 211,
+  "remainingCandidateRows": 231,
+  "caveats": [
+    "Coverage counts facility IDs, not deduplicated real-world venues.",
+    "Public reference prices are not verified current checkout prices.",
+    "Unknown days, times and duration are never inferred.",
+    "Source/local sport mismatches are excluded from hourly sport statistics."
+  ],
+  "manualCandidateRows": 17
+}
