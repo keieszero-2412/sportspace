@@ -205,10 +205,10 @@ export default function HeroSection({
                 <div className="flex items-center gap-1.5">
                   <span
                     className="text-2xl font-black tracking-tight"
-                    style={{ color: isDark ? "#FFF8D2" : "#31465A" }}
+                    style={{ color: "var(--brand-sport)" }}
                   >
                     Sport
-                    <span style={{ color: isDark ? "#84D175" : "#89B9E6" }}>
+                    <span style={{ color: "var(--brand-space)" }}>
                       Space
                     </span>
                   </span>
@@ -405,13 +405,6 @@ export default function HeroSection({
                     <div className="text-xs font-bold truncate max-w-[100px]">
                       {userProfile.name}
                     </div>
-                    <div
-                      className="flex items-center gap-1 text-[10px] font-bold"
-                      style={{ color: isDark ? "#84D175" : "#16A34A" }}
-                    >
-                      <ShieldCheck size={11} />
-                      <span>{userProfile.credibilityScore}đ uy tín</span>
-                    </div>
                   </div>
                 </button>
               ) : (
@@ -524,8 +517,8 @@ export default function HeroSection({
                   onClick={onOpenProfile}
                   className="btn btn-primary flex-1 py-2 text-xs font-bold"
                 >
-                  <ShieldCheck size={14} />
-                  <span>{userProfile.credibilityScore}đ uy tín</span>
+                  <User size={14} />
+                  <span>{userProfile.name}</span>
                 </button>
               ) : (
                 <button

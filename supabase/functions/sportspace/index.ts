@@ -225,6 +225,43 @@ serve(async (req) => {
       });
     }
 
+    if (action === "savedVenues") {
+      const profileClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false, autoRefreshToken: false } },
+      );
+      const { data: profile, error: profileError } = await profileClient
+        .from("Users")
+        .select("raw_data")
+        .eq("id", uid)
+        .maybeSingle();
+      if (profileError) throw profileError;
+
+      const savedVenueIds = Array.isArray(profile?.raw_data?.savedVenueIds)
+        ? profile.raw_data.savedVenueIds.slice(0, 200)
+        : [];
+      if (!savedVenueIds.length) {
+        return new Response(JSON.stringify({ data: [] }), {
+          headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+        });
+      }
+
+      const { data: venues, error: venuesError } = await profileClient
+        .from("Facilities")
+        .select("*")
+        .in("id", savedVenueIds);
+      if (venuesError) throw venuesError;
+
+      const order = new Map(savedVenueIds.map((venueId: string, index: number) => [venueId, index]));
+      const result = (venues || []).sort(
+        (a: any, b: any) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0),
+      );
+      return new Response(JSON.stringify({ data: result }), {
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      });
+    }
+
     throw new Error("Action not supported yet");
   } catch (err) {
     return new Response(JSON.stringify({ 

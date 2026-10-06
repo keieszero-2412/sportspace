@@ -12,6 +12,8 @@
   --bg-secondary: color-mix(in srgb, #F3F7FA 70%, transparent);
   --text-primary: #31465A;
   --text-muted: #5F7489;
+  --brand-sport: #2F6F98;
+  --brand-space: #5BAE58;
   --surface-card: color-mix(in srgb, #D9F0FF 65%, transparent);
   --surface-card-hover: color-mix(in srgb, #C5E5FA 80%, transparent);
   --surface-card-border: color-mix(in srgb, #BCE0F7 40%, transparent);
@@ -46,6 +48,8 @@
   --bg-secondary: color-mix(in srgb, #081E2F 70%, transparent);
   --text-primary: #FFF8D2;
   --text-muted: #B3C9DE;
+  --brand-sport: #89B9E6;
+  --brand-space: #84D175;
   --surface-card: color-mix(in srgb, #3E5BA3 45%, transparent);
   --surface-card-hover: color-mix(in srgb, #4868B7 65%, transparent);
   --surface-card-border: color-mix(in srgb, #5275CB 35%, transparent);
@@ -575,4 +579,3 @@ input:focus, select:focus, textarea:focus {
 .venue-phone-link:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); }
 .venue-phone-link:active { transform: scale(0.97); }
 .venue-phone-link:focus-visible { outline: 2px solid var(--btn-primary); outline-offset: 3px; }
-

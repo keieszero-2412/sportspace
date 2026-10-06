@@ -230,9 +230,9 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
             <div className="flex flex-col">
               <span
                 className="font-black text-xl leading-none tracking-tight"
-                style={{ color: isDark ? "#FFF8D2" : "#31465A" }}
+                style={{ color: "var(--brand-sport)" }}
               >
-                SPORT<span style={{ color: "#22C55E" }}>SPACE</span>
+                Sport<span style={{ color: "var(--brand-space)" }}>Space</span>
               </span>
               <span
                 className="text-[10px] uppercase font-bold tracking-widest"
@@ -407,30 +407,6 @@ export default function AuthModal({ onClose, onLoginSuccess, lang = "vi" }) {
                     }}
                   />
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2 mt-2">
-                <input
-                  type="checkbox"
-                  id="merchant-checkbox"
-                  checked={isMerchant}
-                  onChange={(e) => setIsMerchant(e.target.checked)}
-                  className="w-4 h-4 rounded"
-                  style={{ accentColor: "#22C55E" }}
-                />
-                <label
-                  htmlFor="merchant-checkbox"
-                  style={{
-                    fontSize: "0.85rem",
-                    fontWeight: 600,
-                    color: isDark ? "#B3C9DE" : "#5F7489",
-                    cursor: "pointer",
-                  }}
-                >
-                  {lang === "vi"
-                    ? "Đăng nhập / Đăng ký với vai trò Chủ sân"
-                    : "Login / Register as Venue Owner"}
-                </label>
               </div>
 
               {/* Extended Merchant Fields for Sign Up */}

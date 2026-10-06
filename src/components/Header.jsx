@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  Sun, Moon, Globe, ShieldCheck, User, 
+  Sun, Moon, Globe, User,
   Layers, Users, Calendar, LayoutDashboard, MapPin, Bell
 } from 'lucide-react';
 
@@ -60,8 +60,8 @@ export default function Header({
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span style={{ fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--text-primary)' }}>
-                Sport<span style={{ color: theme === 'dark' ? '#84D175' : '#89B9E6' }}>Space</span>
+              <span style={{ fontSize: '1.35rem', fontWeight: 800, letterSpacing: '-0.5px', color: 'var(--brand-sport)' }}>
+                Sport<span style={{ color: 'var(--brand-space)' }}>Space</span>
               </span>
             </div>
             <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -210,13 +210,6 @@ export default function Header({
               <div className="text-left leading-tight hidden md:block">
                 <div className="text-xs font-bold truncate max-w-[100px]">
                   {userProfile.name}
-                </div>
-                <div 
-                  className="flex items-center gap-1 text-[10px] font-bold"
-                  style={{ color: theme === 'dark' ? '#84D175' : '#16A34A' }}
-                >
-                  <ShieldCheck size={11} />
-                  <span>{userProfile.credibilityScore}đ uy tín</span>
                 </div>
               </div>
             </button>

@@ -262,7 +262,7 @@ export default function UserProfileModal({
               <span className="profile-score-label">
                 {lang === "vi" ? "Uy tín" : "Score"}
               </span>
-              <strong>{userProfile?.credibilityScore ?? 0}</strong>
+              <strong>{userProfile?.credibilityScore ?? 100}</strong>
               <small>/100</small>
             </button>
             {userProfile?.role === "merchant" ? (

@@ -45,6 +45,80 @@
 .form-row label {
   flex: 1 1 180px;
 }
+
+.availability-filter-row {
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.availability-filter-row .availability-filter-field {
+  flex: 1 1 140px;
+  min-width: 0;
+  margin: 8px 0;
+}
+
+.availability-filter-row .availability-filter-date {
+  flex: 1.15 1 170px;
+}
+
+.availability-filter-row .availability-filter-time {
+  flex: 0.85 1 120px;
+}
+
+.availability-filter-row .availability-filter-duration {
+  flex: 0.8 1 112px;
+}
+
+.availability-filter-row .availability-filter-amenity {
+  flex: 1.05 1 145px;
+}
+
+.availability-filter-row .availability-filter-distance {
+  flex: 0.72 1 105px;
+}
+
+.availability-filter-row .availability-filter-field input,
+.availability-filter-row .availability-filter-field select {
+  height: 40px;
+  margin-top: 5px;
+  padding: 8px 10px;
+  font-size: 0.86rem;
+}
+
+.availability-filter-row .distance-filter-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.availability-filter-row .distance-filter-heading strong {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.availability-filter-row .distance-slider-box {
+  height: 40px;
+  gap: 8px;
+  padding: 0 8px;
+  margin-top: 5px;
+}
+
+.availability-filter-row .distance-val-badge {
+  min-width: 38px;
+  padding: 2px 4px;
+  text-align: right;
+  font-size: 0.7rem;
+}
+
+.availability-filter-row > .btn {
+  flex: 0 0 auto;
+  height: 40px;
+  margin-bottom: 8px;
+  padding: 8px 14px;
+  white-space: nowrap;
+}
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
@@ -86,6 +160,15 @@ textarea:focus-visible {
   }
   .booking-flow .form-row .btn {
     flex: 1 1 auto;
+  }
+
+  .availability-filter-row .availability-filter-field {
+    flex: 1 1 calc(50% - 5px);
+  }
+
+  .availability-filter-row .availability-filter-date,
+  .availability-filter-row .availability-filter-amenity {
+    flex-basis: 100%;
   }
 }
 

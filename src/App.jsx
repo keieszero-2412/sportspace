@@ -134,24 +134,9 @@ export default function App() {
       if (["vi", "en"].includes(currentProfile.preferredLanguage))
         setLang(currentProfile.preferredLanguage);
     };
-    const loadProfile = async () => {
-      try {
-        const profile = await api("saveProfile", {
-          name: currentProfile.name,
-          phone: currentProfile.phone,
-          initializeOnly: true,
-        });
-        publishProfile(profile);
-      } catch (error) {
-        if (active)
-          showError(`Đã đăng nhập, nhưng chưa tải được hồ sơ. / Signed in, but your profile could not be loaded. ${error.message}`);
-      }
-      if (!active) return;
-      stopProfile = watchProfile(authUser.id, publishProfile, (error) => {
-        if (active) showError(error.message);
-      });
-    };
-    void loadProfile();
+    stopProfile = watchProfile(authUser.id, publishProfile, (error) => {
+      if (active) showError(error.message);
+    });
     return () => {
       active = false;
       stopProfile();
@@ -502,45 +487,10 @@ export default function App() {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                  {/* Amenity quick filter */}
-                  <select
-                    value={selectedAmenity}
-                    onChange={(e) => setSelectedAmenity(e.target.value)}
-                    style={{
-                      padding: "8px 12px",
-                      borderRadius: "var(--radius-sm)",
-                      border: "1px solid var(--surface-card-border)",
-                      background: "var(--surface-card)",
-                      color: "var(--text-primary)",
-                      fontSize: "0.82rem",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                  >
-                    <option value="ALL">
-                      ⚙️ {lang === "vi" ? "Mọi tiện ích" : "All Amenities"}
-                    </option>
-                    <option value="Mái che">
-                      {lang === "vi" ? "Có mái che" : "Covered Roof"}
-                    </option>
-                    <option value="Đèn">
-                      {lang === "vi" ? "Đèn chiếu sáng" : "Night Floodlights"}
-                    </option>
-                    <option value="Đỗ xe">
-                      {lang === "vi" ? "Bãi đỗ ô tô" : "Car Parking"}
-                    </option>
-                    <option value="Điều hòa">
-                      {lang === "vi"
-                        ? "Điều hòa / Quạt mát"
-                        : "Air Conditioning"}
-                    </option>
-                  </select>
-                </div>
               </div>
 
-              <div className="booking-flow form-row">
-                <label>
+              <div className="booking-flow form-row availability-filter-row">
+                <label className="availability-filter-field availability-filter-date">
                   {lang === "vi"
                     ? "Tìm lịch trống theo ngày"
                     : "Filter availability by date"}
@@ -550,7 +500,7 @@ export default function App() {
                     onChange={(e) => setAvailableDate(e.target.value)}
                   />
                 </label>
-                <label>
+                <label className="availability-filter-field availability-filter-time">
                   {lang === "vi" ? "Giờ bắt đầu" : "Start time"}
                   <input
                     type="time"
@@ -559,7 +509,7 @@ export default function App() {
                     onChange={(e) => setAvailableTime(e.target.value)}
                   />
                 </label>
-                <label>
+                <label className="availability-filter-field availability-filter-duration">
                   {lang === "vi" ? "Thời lượng" : "Duration"}
                   <select
                     value={availableDuration}
@@ -574,35 +524,75 @@ export default function App() {
                     ))}
                   </select>
                 </label>
-                <label>
-                  {lang === "vi" ? "Khoảng cách" : "Distance"}
+                <label className="availability-filter-field availability-filter-amenity">
+                  {lang === "vi" ? "Tiện ích" : "Amenities"}
                   <select
-                    value={maxDistance}
-                    onChange={async (e) => {
-                      const val = e.target.value;
-                      if (val !== "ALL" && !userLocation) {
-                        try {
-                          const loc = await getCurrentPosition();
-                          setUserLocation(loc);
-                        } catch (err) {
-                          showError(err.message || (lang === "vi" ? "Không lấy được vị trí của bạn" : "Could not get your location"));
-                          return;
-                        }
-                      }
-                      setMaxDistance(val);
-                    }}
+                    value={selectedAmenity}
+                    onChange={(e) => setSelectedAmenity(e.target.value)}
                   >
-                    <option value="ALL">{lang === "vi" ? "Mọi khoảng cách" : "Any distance"}</option>
-                    <option value="5">{lang === "vi" ? "Dưới 5 km" : "Under 5 km"}</option>
-                    <option value="10">{lang === "vi" ? "Dưới 10 km" : "Under 10 km"}</option>
-                    <option value="20">{lang === "vi" ? "Dưới 20 km" : "Under 20 km"}</option>
+                    <option value="ALL">
+                      {lang === "vi" ? "Mọi tiện ích" : "All amenities"}
+                    </option>
+                    <option value="Mái che">
+                      {lang === "vi" ? "Có mái che" : "Covered roof"}
+                    </option>
+                    <option value="Đèn">
+                      {lang === "vi" ? "Đèn chiếu sáng" : "Floodlights"}
+                    </option>
+                    <option value="Đỗ xe">
+                      {lang === "vi" ? "Bãi đỗ ô tô" : "Car parking"}
+                    </option>
+                    <option value="Điều hòa">
+                      {lang === "vi" ? "Điều hòa / Quạt mát" : "Air conditioning"}
+                    </option>
                   </select>
+                </label>
+                <label className="availability-filter-field availability-filter-distance">
+                  <span className="distance-filter-heading">
+                    <span>{lang === "vi" ? "Khoảng cách" : "Distance"}</span>
+                    <strong>
+                      {maxDistance === "ALL"
+                        ? lang === "vi"
+                          ? "Mọi khoảng cách"
+                          : "Any distance"
+                        : `${maxDistance} km`}
+                    </strong>
+                  </span>
+                  <span className="distance-slider-box">
+                    <input
+                      className="custom-distance-slider"
+                      type="range"
+                      min="1"
+                      max="50"
+                      step="1"
+                      value={maxDistance === "ALL" ? 20 : maxDistance}
+                      aria-label={lang === "vi" ? "Khoảng cách tối đa" : "Maximum distance"}
+                      onChange={async (e) => {
+                        const val = e.target.value;
+                        if (!userLocation) {
+                          try {
+                            const loc = await getCurrentPosition();
+                            setUserLocation(loc);
+                          } catch (err) {
+                            showError(err.message || (lang === "vi" ? "Không lấy được vị trí của bạn" : "Could not get your location"));
+                            return;
+                          }
+                        }
+                        setMaxDistance(val);
+                      }}
+                    />
+                    <span className="distance-val-badge">
+                      {maxDistance === "ALL" ? "20" : maxDistance} km
+                    </span>
+                  </span>
                 </label>
                 <button
                   className="btn btn-outline"
                   onClick={() => {
                     setAvailableDate("");
                     setAvailableTime("");
+                    setSelectedAmenity("ALL");
+                    setAvailableDuration(60);
                     setMaxDistance("ALL");
                   }}
                 >

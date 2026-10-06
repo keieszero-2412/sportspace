@@ -20,7 +20,12 @@ export async function saveProfile(client, user, data, now = Date.now()) {
   };
   const prior = await get();
   if (prior?.deletionRequested) throw new Error('account-deleting');
-  if (prior && data.initializeOnly) return prior;
+  const priorScore = Number(prior?.credibilityScore);
+  const credibilityScore = Number.isFinite(priorScore)
+    ? Math.max(0, Math.min(100, priorScore))
+    : 100;
+  if (prior && data.initializeOnly)
+    return { ...prior, credibilityScore };
   const merged = {
     ...(prior || {
       role: 'user',
@@ -32,6 +37,7 @@ export async function saveProfile(client, user, data, now = Date.now()) {
       createdAt: new Date(now).toISOString(),
     }),
     ...profilePatch(data),
+    credibilityScore,
     id: uid,
     uid,
     email: user.email || '',

@@ -27,6 +27,9 @@ export function profileForUser(user, row) {
     name: profile.name || metadata.name || metadata.full_name || user.email?.split('@')[0] || 'SportSpace',
     phone: profile.phone || metadata.phone || '',
     role: profile.role || 'user',
+    credibilityScore: Number.isFinite(Number(profile.credibilityScore))
+      ? Math.max(0, Math.min(100, Number(profile.credibilityScore)))
+      : 100,
     favoriteSports: arrayValue(profile.favoriteSports),
     savedVenueIds: arrayValue(profile.savedVenueIds),
     // user_metadata is user-editable and must never grant admin access.
