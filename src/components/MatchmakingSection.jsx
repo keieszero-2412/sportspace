@@ -9,9 +9,13 @@ export default function MatchmakingSection({
   lang = "vi",
   userProfile,
   onRequireAuth,
+  requestedMatchId,
+  onRequestedMatchHandled = () => {},
 }) {
   const tr = (vi, en) => (lang === "vi" ? vi : en),
     { showError, showSuccess } = useToast();
+  const localized = (match, field) =>
+    match?.[`${field}${lang === "vi" ? "Vi" : "En"}`] || match?.[field] || "";
   const [matches, setMatches] = useState([]),
     [loading, setLoading] = useState(true),
     [error, setError] = useState(null),
@@ -22,7 +26,8 @@ export default function MatchmakingSection({
     [userLocation, setUserLocation] = useState(null),
     [showForm, setShowForm] = useState(false),
     [busy, setBusy] = useState(false),
-    [confirm, setConfirm] = useState(null);
+    [confirm, setConfirm] = useState(null),
+    [joinConfirm, setJoinConfirm] = useState(null);
   const blank = () => ({
     title: "",
     sport: "Pickleball",
@@ -60,6 +65,12 @@ export default function MatchmakingSection({
       { limit: 1000 },
     );
   }, [retry]);
+  useEffect(() => {
+    if (!requestedMatchId || !userProfile || loading) return;
+    const match = matches.find((item) => item.id === requestedMatchId);
+    if (match && !(match.joinedUsers || []).includes(userProfile.uid)) setJoinConfirm(match);
+    onRequestedMatchHandled();
+  }, [requestedMatchId, userProfile, loading, matches, onRequestedMatchHandled]);
   async function create(e) {
     e.preventDefault();
     if (busy) return;
@@ -95,6 +106,10 @@ export default function MatchmakingSection({
     try {
       await api("matchTransition", { matchId: m.id, operation });
       setConfirm(null);
+      if (operation === "join") {
+        setJoinConfirm(null);
+        showSuccess(tr("Đã tham gia trận đấu.", "You joined the match."));
+      }
     } catch (e) {
       showError(e.message);
     } finally {
@@ -103,6 +118,7 @@ export default function MatchmakingSection({
   }
   const visible = matches.filter((m) => {
     if (m.startAt <= Date.now()) return false;
+    if (m.playersJoined >= m.playersMax) return false;
     if (sport !== "ALL" && m.sport !== sport) return false;
     
     if (dateFilter !== "ALL") {
@@ -143,6 +159,7 @@ export default function MatchmakingSection({
         <h2>{tr("Ghép đội và giao lưu", "Find a match")}</h2>
         <button
           className="btn btn-primary"
+          disabled={Boolean(userProfile) && Number(userProfile.credibilityScore || 0) <= 80}
           onClick={() => {
             if (!userProfile) {
               onRequireAuth();
@@ -156,6 +173,9 @@ export default function MatchmakingSection({
         >
           {tr("Tạo kèo", "Create match")}
         </button>
+        {userProfile && Number(userProfile.credibilityScore || 0) <= 80 && (
+          <small>{tr("Cần trên 80 điểm uy tín để tạo kèo.", "A credibility score above 80 is required to create a match.")}</small>
+        )}
         <select value={sport} onChange={(e) => setSport(e.target.value)}>
           <option value="ALL">{tr("Tất cả môn", "All sports")}</option>
           {sports.map((s) => (
@@ -207,8 +227,14 @@ export default function MatchmakingSection({
               <span className="badge">
                 {m.sport} · {m.province}
               </span>
-              <h3>{m.title}</h3>
+              <h3>{localized(m, "title")}</h3>
               <p>{m.venueName}</p>
+              {m.reservationStatus === "confirmed" && (
+                <p className="match-reservation-confirmed">
+                  ✓ {localized(m, "reservationLabel") || tr("Sân đã xác nhận", "Court confirmed")}
+                  {m.courtName ? ` · ${m.courtName}` : ""}
+                </p>
+              )}
               <p>
                 {new Date(m.startAt).toLocaleString(
                   lang === "vi" ? "vi-VN" : "en-GB",
@@ -217,8 +243,15 @@ export default function MatchmakingSection({
                 · {m.time}
               </p>
               <p>
-                {tr("Trình độ", "Skill")}: {m.levelRequired}
+                {tr("Trình độ", "Skill")}: {localized(m, "levelRequired")}
               </p>
+              {(m.genderPreference || m.ageGroup || m.playStyle || m.matchFormat) && (
+                <p>
+                  {[localized(m, "genderPreference"), localized(m, "ageGroup"), localized(m, "playStyle"), localized(m, "matchFormat")]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              )}
               <p>
                 Host: {m.hostName} · {m.hostCredibility ?? 0}{" "}
                 {tr("điểm", "pts")}
@@ -230,6 +263,9 @@ export default function MatchmakingSection({
                       m.costPerPerson ?? m.cost ?? tr("Chưa có", "Unavailable"),
                     )}{" "}
                 / {tr("người", "player")} · {m.playersJoined}/{m.playersMax}
+              </p>
+              <p>
+                {tr("Còn thiếu", "Players needed")}: {Math.max(0, m.playersMax - m.playersJoined)}
               </p>
               {joined && (
                 <p>
@@ -279,7 +315,7 @@ export default function MatchmakingSection({
                   <button
                     className="btn btn-primary"
                     disabled={busy || m.playersJoined >= m.playersMax}
-                    onClick={() => change(m, "join")}
+                    onClick={() => setJoinConfirm(m)}
                   >
                     {tr("Tham gia", "Join")}
                   </button>
@@ -403,6 +439,34 @@ export default function MatchmakingSection({
               </button>
             </div>
           </form>
+        </div>
+      )}
+      {joinConfirm && (
+        <div className="modal-overlay" onClick={() => !busy && setJoinConfirm(null)}>
+          <div className="modal-content booking-flow" onClick={(event) => event.stopPropagation()}>
+            <h3>{tr("Xác nhận tham gia", "Confirm participation")}</h3>
+            <h4>{localized(joinConfirm, "title")}</h4>
+            <p><strong>{tr("Sân", "Venue")}:</strong> {joinConfirm.venueName}</p>
+            {joinConfirm.venueAddress && <p><strong>{tr("Địa chỉ", "Address")}:</strong> {joinConfirm.venueAddress}</p>}
+            {joinConfirm.courtName && <p><strong>{tr("Sân con", "Court")}:</strong> {joinConfirm.courtName}</p>}
+            <p><strong>{tr("Thời gian", "Time")}:</strong> {new Date(joinConfirm.startAt).toLocaleString(lang === "vi" ? "vi-VN" : "en-GB", { timeZone: "Asia/Ho_Chi_Minh" })} · {joinConfirm.time}</p>
+            <p><strong>{tr("Môn", "Sport")}:</strong> {joinConfirm.sport}</p>
+            <p><strong>{tr("Trình độ", "Skill")}:</strong> {localized(joinConfirm, "levelRequired")}</p>
+            <p><strong>{tr("Người tổ chức", "Host")}:</strong> {joinConfirm.hostName} · {joinConfirm.hostCredibility} {tr("điểm", "points")}</p>
+            <p><strong>{tr("Chi phí", "Cost")}:</strong> {Number(joinConfirm.costPerPerson || 0).toLocaleString(lang === "vi" ? "vi-VN" : "en-US")} VND/{tr("người", "player")}</p>
+            <p><strong>{tr("Số người", "Players")}:</strong> {joinConfirm.playersJoined}/{joinConfirm.playersMax} · {tr("còn thiếu", "needed")} {Math.max(0, joinConfirm.playersMax - joinConfirm.playersJoined)}</p>
+            {(joinConfirm.genderPreference || joinConfirm.ageGroup || joinConfirm.playStyle || joinConfirm.matchFormat) && (
+              <p>{[localized(joinConfirm, "genderPreference"), localized(joinConfirm, "ageGroup"), localized(joinConfirm, "playStyle"), localized(joinConfirm, "matchFormat")].filter(Boolean).join(" · ")}</p>
+            )}
+            <div className="form-row">
+              <button type="button" className="btn btn-outline" disabled={busy} onClick={() => setJoinConfirm(null)}>
+                {tr("Đóng", "Close")}
+              </button>
+              <button type="button" className="btn btn-primary" disabled={busy} onClick={() => change(joinConfirm, "join")}>
+                {busy ? tr("Đang xử lý…", "Processing…") : tr("Xác nhận tham gia", "Confirm join")}
+              </button>
+            </div>
+          </div>
         </div>
       )}
       <ConfirmModal

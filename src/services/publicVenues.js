@@ -44,6 +44,7 @@ const publicFields = [
   "lat",
   "lng",
 ];
+const queryFields = ["id", ...publicFields].join(",");
 
 function publicVenue(data) {
   return {
@@ -55,6 +56,16 @@ function publicVenue(data) {
     id: data.id,
   };
 }
+
+const bundledPublicVenues = bundledVenues.map(publicVenue);
+const bundledSearchText = new Map(
+  bundledPublicVenues.map((venue) => [
+    venue.id,
+    normalize(
+      `${venue.name || ""} ${venue.address || ""} ${venue.province || ""} ${venue.name_en || ""}`,
+    ),
+  ]),
+);
 
 function matchesVenue(venue, data, search) {
   if (venue.status === "archived") return false;
@@ -72,9 +83,10 @@ function matchesVenue(venue, data, search) {
     return false;
   if (
     search &&
-    !normalize(
-      `${venue.name || ""} ${venue.address || ""} ${venue.province || ""} ${venue.name_en || ""}`,
-    ).includes(search)
+    !(bundledSearchText.get(venue.id) ||
+      normalize(
+        `${venue.name || ""} ${venue.address || ""} ${venue.province || ""} ${venue.name_en || ""}`,
+      )).includes(search)
   )
     return false;
   return true;
@@ -90,8 +102,7 @@ function applyDistance(venue, data) {
 }
 
 function listBundledVenues(data, search) {
-  const filtered = bundledVenues
-    .map(publicVenue)
+  const filtered = bundledPublicVenues
     .filter((venue) => matchesVenue(venue, data, search))
     .map((venue) => applyDistance(venue, data))
     .filter(Boolean);
@@ -113,21 +124,50 @@ export async function listPublicVenues(data = {}) {
   let hasMore = true;
   
   const search = normalize(data.search?.trim());
+  const remoteSearch = String(data.search || "")
+    .trim()
+    .replace(/[\\%_(),]/g, " ")
+    .replace(/\s+/g, " ");
   while (items.length < PAGE_SIZE && hasMore) {
-    let q = supabase.from("Facilities").select("*").order("id").limit(BATCH_SIZE);
-    
-    if (data.province && data.province !== "ALL") {
-      q = q.eq("province", data.province);
-    } else if (data.sport && data.sport !== "ALL") {
-      q = q.eq("sport", data.sport);
+    const buildQuery = (withSearch) => {
+      let q = supabase
+        .from("Facilities")
+        .select(queryFields)
+        .order("id")
+        .limit(BATCH_SIZE);
+      if (data.province && data.province !== "ALL") q = q.eq("province", data.province);
+      if (data.sport && data.sport !== "ALL") q = q.eq("sport", data.sport);
+      if (cursor) q = q.gt("id", cursor);
+      if (withSearch) {
+        q = q.or(
+          ["name", "name_en", "address", "address_en", "province", "province_en"]
+            .map((field) => `${field}.ilike.%${remoteSearch}%`)
+            .join(","),
+        );
+      }
+      return q;
+    };
+
+    let { data: snapshot, error } = await buildQuery(Boolean(remoteSearch));
+    if (error) {
+      if (["PGRST205", "42P01", "42703"].includes(error.code)) {
+        snapshot = [];
+      } else {
+        throw error;
+      }
     }
-    
-    if (cursor) {
-      q = q.gt("id", cursor);
+    // Postgres ilike is accent-sensitive. Retry one unfiltered batch when a
+    // normalized client search has no server-side match, preserving accent-insensitive search.
+    if (remoteSearch && !items.length && !snapshot.length && !data.cursor) {
+      ({ data: snapshot, error } = await buildQuery(false));
+      if (error) {
+        if (["PGRST205", "42P01", "42703"].includes(error.code)) {
+          snapshot = [];
+        } else {
+          throw error;
+        }
+      }
     }
-    
-    const { data: snapshot, error } = await q;
-    if (error) throw error;
     if (!snapshot.length && !items.length && !data.cursor) {
       return listBundledVenues(data, search);
     }
@@ -166,8 +206,8 @@ export async function publicCatalogue() {
     supabase.from("Facilities").select("*", { count: "exact", head: true }),
     supabase.from("Courts").select("*", { count: "exact", head: true }),
   ]);
-  if (facilities.error) throw facilities.error;
-  if (courts.error) throw courts.error;
+  if (facilities.error && !["PGRST205", "42P01", "42703"].includes(facilities.error.code)) throw facilities.error;
+  if (courts.error && !["PGRST205", "42P01", "42703"].includes(courts.error.code)) throw courts.error;
 
   return {
     provinces,

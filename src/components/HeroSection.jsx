@@ -49,6 +49,7 @@ export default function HeroSection({
   onOpenProfile = () => {},
   onOpenAuth = () => {},
   onSelectMatch = () => {},
+  onJoinMatch = () => {},
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("home"); // 'home' | 'venues' | 'matches' | 'merchant' | 'account'
@@ -714,7 +715,7 @@ export default function HeroSection({
                                 justifyContent: "center",
                               }}
                             >
-                              {m.title || m.venue}
+                              {(lang === "vi" ? raw.titleVi : raw.titleEn) || m.title || m.venue}
                             </h4>
 
                             {/* Venue Name & District */}
@@ -813,7 +814,7 @@ export default function HeroSection({
                                   color: isDark ? "#FFF8D2" : "#31465A",
                                 }}
                               >
-                                {m.levelRequired}
+                                {(lang === "vi" ? raw.levelRequiredVi : raw.levelRequiredEn) || m.levelRequired}
                               </div>
                             </div>
 
@@ -852,6 +853,7 @@ export default function HeroSection({
 
                             {/* Primary Action Button (#89B9E6 light / #84D175 dark) */}
                             <button
+                              type="button"
                               className="w-full mt-2 py-2 px-3 rounded-lg font-bold text-xs flex items-center justify-center gap-1.5 shadow-sm transition-all"
                               style={{
                                 backgroundColor: isDark ? "#84D175" : "#89B9E6",
@@ -866,6 +868,10 @@ export default function HeroSection({
                                 e.currentTarget.style.backgroundColor = isDark
                                   ? "#84D175"
                                   : "#89B9E6";
+                              }}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                onJoinMatch(raw);
                               }}
                             >
                               <span>

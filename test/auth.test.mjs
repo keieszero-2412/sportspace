@@ -36,6 +36,7 @@ test('canonical profile columns override stale legacy raw data', () => {
 
 test('redirects exclude stale OAuth tokens and errors', () => {
   assert.equal(authRedirectUrl({ origin: 'https://sport.example', pathname: '/', search: '?error=x', hash: '#token=x' }), 'https://sport.example/');
+  assert.equal(authRedirectUrl({ origin: 'http://localhost:3000', pathname: '/venue/123' }), 'http://localhost:3000/');
 });
 
 test('OAuth errors are consumed once without deleting unrelated URL parameters', () => {

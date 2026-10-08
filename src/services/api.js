@@ -16,6 +16,8 @@ const errors = {
   "match-full": "Kèo đã đủ người. / The match is full.",
   "match-closed":
     "Kèo đã đóng hoặc quá giờ tham gia. / The match is closed or already started.",
+  "credibility-too-low":
+    "Cần trên 80 điểm uy tín để tạo kèo. / A credibility score above 80 is required to create a match.",
   "payment-not-configured":
     "Chủ sân chưa có tài khoản nhận tiền được xác minh. / The payment account is not verified.",
   "slot-taken":

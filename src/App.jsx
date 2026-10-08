@@ -59,6 +59,7 @@ export default function App() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [savedVenues, setSavedVenues] = useState([]);
   const [latestMatches, setLatestMatches] = useState([]);
+  const [pendingJoinMatchId, setPendingJoinMatchId] = useState(null);
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("sportspace_theme", theme);
@@ -248,7 +249,7 @@ export default function App() {
           ["status", "==", "open"],
           ["startAt", ">", Date.now()],
         ],
-        setLatestMatches,
+        (rows) => setLatestMatches(rows.map((row) => ({ ...row, ...(row.raw_data || {}) }))),
         () => {},
         { order: "startAt", direction: "asc", limit: 10 },
       ),
@@ -412,6 +413,14 @@ export default function App() {
             setCurrentTab={setCurrentTab}
             onOpenProfile={() => setShowProfile(true)}
             onOpenAuth={() => setShowAuth(true)}
+            onJoinMatch={(match) => {
+              if (authLoading) return;
+              setPendingJoinMatchId(match.id);
+              setCurrentTab("matchmaking");
+              if (!userProfile?.uid) {
+                setShowAuth(true);
+              }
+            }}
             unreadNotificationCount={unreadNotificationCount}
             onOpenNotifications={() => setShowNotifications(true)}
           />
@@ -703,6 +712,8 @@ export default function App() {
               lang={lang}
               userProfile={userProfile}
               onRequireAuth={() => setShowAuth(true)}
+              requestedMatchId={pendingJoinMatchId}
+              onRequestedMatchHandled={() => setPendingJoinMatchId(null)}
             />
           </ErrorBoundary>
         )}

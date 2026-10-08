@@ -1,5 +1,8 @@
 export function authRedirectUrl(location = window.location) {
-  return `${location.origin}${location.pathname}`;
+  // Keep OAuth callbacks on the origin that started the flow. Using a nested
+  // pathname can miss Supabase's exact redirect allow-list and make GoTrue
+  // fall back to the production Site URL instead.
+  return new URL('/', location.origin).toString();
 }
 
 export async function fetchWithTimeout(input, options = {}, timeoutMs = 15000) {

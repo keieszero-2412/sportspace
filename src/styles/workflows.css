@@ -130,6 +130,13 @@
   border-radius: 14px;
   overflow-wrap: anywhere;
 }
+.admin-panel {
+  min-height: calc(100vh - 120px);
+  overflow: visible;
+}
+.admin-image-grid {
+  align-items: start;
+}
 .court-timetable {
   border-collapse: separate;
   border-spacing: 6px;
@@ -384,4 +391,12 @@ select.venue-filter-input {
   .venue-filter-clear-btn {
     width: 100%;
   }
+}
+.match-reservation-confirmed {
+  color: #15803d;
+  font-weight: 700;
+}
+
+[data-theme="dark"] .match-reservation-confirmed {
+  color: #86efac;
 }

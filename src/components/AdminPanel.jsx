@@ -78,7 +78,7 @@ export default function AdminPanel({ lang = "vi" }) {
       review: imageReviews[venue.id] || null,
     }))
     .filter((venue) => {
-      const isWeak = venue.candidate?.status === "search_title_matches_exact_name_address_query";
+      const isWeak = Boolean(venue.candidate) && !venue.review;
       const isUnresolved = !venue.candidate;
       if (imageFilter === "weak") return isWeak && !venue.review;
       if (imageFilter === "unresolved") return isUnresolved && !venue.review;
@@ -97,7 +97,7 @@ export default function AdminPanel({ lang = "vi" }) {
     showSuccess(tr("Đã lưu kết quả duyệt trên trình duyệt.", "Review saved in this browser."));
   };
   return (
-    <section className="container booking-flow" style={{ padding: 24 }}>
+    <section className="container booking-flow admin-panel" style={{ padding: "24px 20px 56px" }}>
       <h2>
         {tr(
           "Duyệt chủ sân và tài khoản nhận tiền",
@@ -137,13 +137,16 @@ export default function AdminPanel({ lang = "vi" }) {
           </span>
         </div>
       </article>
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 admin-image-grid">
         {imagePageRows.map((venue) => (
           <article className="glass-panel feature-card" key={venue.id}>
             <img
-              src={venue.image}
+              src={venue.candidate?.image || venue.image || venue.candidates[0]?.imageUrl || "/logo.png"}
               alt={venue.name}
               loading="lazy"
+              onError={(event) => {
+                event.currentTarget.src = "/logo.png";
+              }}
               style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 12, background: "var(--bg-secondary)" }}
             />
             <h3 style={{ marginTop: 12 }}>{venue.name}</h3>

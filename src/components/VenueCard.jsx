@@ -9,6 +9,12 @@ import {
 import GoogleRating from "./GoogleRating";
 import VenuePhone from "./VenuePhone";
 
+function isPriceSummary(value) {
+  const text = String(value || "").trim();
+  return /\d[\d.,\s]*(?:đ|vnđ|vnd|k)\b/i.test(text) &&
+    /(?:giá|thuê|sân|giờ|\/\s*h\b)/i.test(text);
+}
+
 const VenueCard = React.memo(function VenueCard({
   venue,
   onViewDetails,
@@ -34,6 +40,11 @@ const VenueCard = React.memo(function VenueCard({
   } = venue;
 
   const name = lang === "en" ? name_en || nameVi : nameVi;
+  const displayPrice = isPriceSummary(price_summary)
+    ? price_summary
+    : lang === "vi"
+      ? "Chưa có giá công khai"
+      : "No public price";
   const [imageFailed, setImageFailed] = React.useState(false);
   const province = lang === "en" ? province_en || provinceVi : provinceVi;
   const address = lang === "en" ? address_en || addressVi : addressVi;
@@ -272,7 +283,7 @@ const VenueCard = React.memo(function VenueCard({
               color: "var(--text-primary)",
             }}
           >
-            {price_summary}
+            {displayPrice}
           </div>
         </div>
 
