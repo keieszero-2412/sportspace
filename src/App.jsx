@@ -6,6 +6,19 @@ import VenueCardSkeleton from "./components/VenueCardSkeleton";
 import VenueDetailModal from "./components/VenueDetailModal";
 import BookingModal from "./components/BookingModal";
 import MatchmakingSection from "./components/MatchmakingSection";
+import SportIcon, {
+  getSportBadgeStyle,
+  getSportPillStyle,
+  getSportTextColor,
+} from "./components/SportIcons";
+import {
+  IconCalendar,
+  IconClock,
+  IconHourglass,
+  IconSparkles,
+  IconMapPin,
+  IconRefresh,
+} from "@tabler/icons-react";
 
 const MerchantDashboard = React.lazy(
   () => import("./components/MerchantDashboard"),
@@ -18,6 +31,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import InfoModal from "./components/InfoModal";
 
 import { supabase } from "./supabase";
+import { publicMatchFeed } from "./services/publicMatches";
 import {
   api,
   cachedApi,
@@ -74,6 +88,7 @@ export default function App() {
 
   const [authLoading, setAuthLoading] = useState(true);
   const [userProfile, setUserProfile] = useState(null);
+  const isAdminWorkspace = currentTab === 'admin' && Boolean(userProfile?.isAdmin || userProfile?.role === 'admin');
   const [authUser, setAuthUser] = useState(null);
   const [passwordRecovery, setPasswordRecovery] = useState(false);
 
@@ -209,6 +224,7 @@ export default function App() {
     [queryKey],
   );
   useEffect(() => {
+    if (isAdminWorkspace) return;
     const cached = cachedApi("listVenues", {
       province: selectedProvince,
       sport: selectedSport,
@@ -226,8 +242,9 @@ export default function App() {
     setHasMoreVenues(cached?.hasMore || false);
     setVenuesData(cached?.items || []);
     loadVenues();
-  }, [loadVenues]);
+  }, [loadVenues, isAdminWorkspace]);
   useEffect(() => {
+    if (isAdminWorkspace) return;
     let active = true;
     setCatalogueError(null);
     api("catalogue")
@@ -240,20 +257,14 @@ export default function App() {
     return () => {
       active = false;
     };
-  }, [retryKey]);
+  }, [retryKey, isAdminWorkspace]);
   useEffect(
     () =>
-      watch(
-        "Matches",
-        [
-          ["status", "==", "open"],
-          ["startAt", ">", Date.now()],
-        ],
-        (rows) => setLatestMatches(rows.map((row) => ({ ...row, ...(row.raw_data || {}) }))),
-        () => {},
-        { order: "startAt", direction: "asc", limit: 10 },
-      ),
-    [],
+      !isAdminWorkspace ? publicMatchFeed.subscribe(
+        (rows) => setLatestMatches(rows.slice(0, 10)),
+        (error) => console.warn("Match preview unavailable:", error.message),
+      ) : undefined,
+    [isAdminWorkspace],
   );
 
   // System Notifications state (README 4.3)
@@ -286,6 +297,7 @@ export default function App() {
     [userProfile?.uid, showError],
   );
   useEffect(() => {
+    if (isAdminWorkspace) return;
     if (!userProfile?.uid) return;
     return watch(
       "Notifications",
@@ -294,9 +306,10 @@ export default function App() {
       (e) => showError(e.message),
       { order: "createdAt", limit: 100 },
     );
-  }, [userProfile?.uid, showError]);
+  }, [userProfile?.uid, showError, isAdminWorkspace]);
   useEffect(() => {
     let active = true;
+    if (isAdminWorkspace) return;
     if (userProfile?.uid)
       api("savedVenues")
         .then((v) => {
@@ -308,7 +321,7 @@ export default function App() {
     return () => {
       active = false;
     };
-  }, [userProfile?.uid, JSON.stringify(savedVenueIds), showError]);
+  }, [userProfile?.uid, JSON.stringify(savedVenueIds), showError, isAdminWorkspace]);
 
   // Modals state
   const [detailVenue, setDetailVenue] = useState(null);
@@ -351,7 +364,7 @@ export default function App() {
 
   const getSportLabel = (sport, currentLang) => {
     if (sport === "ALL")
-      return currentLang === "vi" ? "🏅 Tất cả bộ môn" : "🏅 All Sports";
+      return currentLang === "vi" ? "Tất cả bộ môn" : "All Sports";
     if (currentLang === "en") {
       const map = {
         Pickleball: "Pickleball",
@@ -385,7 +398,16 @@ export default function App() {
       {/* MAIN VIEW CONTROLLER */}
       <main style={{ flex: 1 }}>
         {/* HERO SECTION (ALWAYS RENDERED AS THE MAIN DASHBOARD HEADER) */}
-        <div>
+        {isAdminWorkspace ? <header aria-label="Admin workspace" style={{ borderBottom: '1px solid var(--surface-card-border)', background: 'var(--bg-primary)', padding: '16px 20px' }}>
+          <div className="container" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+            <div><strong>SportSpace · Admin</strong><p style={{ fontSize: '.8rem', color: 'var(--text-muted)' }}>{userProfile?.email}</p></div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              <button className="btn btn-outline" onClick={() => setLang(lang === 'vi' ? 'en' : 'vi')}>{lang === 'vi' ? 'English' : 'Tiếng Việt'}</button>
+              <button className="btn btn-outline" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>{lang === 'vi' ? 'Đổi giao diện' : 'Switch theme'}</button>
+              <button className="btn btn-outline" onClick={() => setCurrentTab('explore')}>{lang === 'vi' ? 'Về trang người chơi' : 'Back to player site'}</button>
+            </div>
+          </div>
+        </header> : <div>
           <HeroSection
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
@@ -424,7 +446,7 @@ export default function App() {
             unreadNotificationCount={unreadNotificationCount}
             onOpenNotifications={() => setShowNotifications(true)}
           />
-        </div>
+        </div>}
 
         {/* TAB 1: EXPLORE VENUES (KHÁM PHÁ SÂN TOÀN QUỐC - README 4.1) */}
         {currentTab === "explore" && (
@@ -450,7 +472,7 @@ export default function App() {
                     <button
                       key={sport}
                       onClick={() => setSelectedSport(sport)}
-                      className={`btn ${isAct ? "btn-primary" : "btn-outline"}`}
+                      className={`inline-flex items-center gap-2 font-extrabold cursor-pointer transition-all border ${getSportPillStyle(sport, isAct)}`}
                       style={{
                         padding: "8px 16px",
                         fontSize: "0.85rem",
@@ -458,7 +480,8 @@ export default function App() {
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {getSportLabel(sport, lang)}
+                      <SportIcon sport={sport} size={15} />
+                      <span>{getSportLabel(sport, lang)}</span>
                     </button>
                   );
                 })}
@@ -485,7 +508,11 @@ export default function App() {
                         ? `Sân Thể Thao Tại ${selectedProvince}`
                         : `Sports Venues in ${selectedProvince}`}
                     {selectedSport !== "ALL" &&
-                      ` • ${getSportLabel(selectedSport, lang)}`}
+                      <span className={`inline-flex items-center gap-1.5 ml-2.5 px-3 py-0.5 rounded-full text-xs font-bold border align-middle ${getSportBadgeStyle(selectedSport)}`}>
+                        <SportIcon sport={selectedSport} size={14} />
+                        <span>{getSportLabel(selectedSport, lang)}</span>
+                      </span>
+                    }
                   </h2>
                   <div
                     style={{ fontSize: "0.85rem", color: "var(--text-muted)" }}
@@ -498,122 +525,188 @@ export default function App() {
 
               </div>
 
-              <div className="booking-flow form-row availability-filter-row">
-                <label className="availability-filter-field availability-filter-date">
-                  {lang === "vi"
-                    ? "Tìm lịch trống theo ngày"
-                    : "Filter availability by date"}
+              {/* Find Venues Glass Command Bar - Styled identical to Matchmaking */}
+              <div className="glass-panel p-2 rounded-2xl border border-[var(--surface-card-border)] shadow-sm bg-[var(--surface-card)] flex flex-col md:flex-row flex-wrap items-stretch md:items-center gap-2 mb-4">
+                {/* Segment 1: Ngày đặt sân (Play date) */}
+                <div className="flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-[var(--surface-card-border)] hover:border-blue-500/50 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-500/20 transition-all cursor-pointer">
+                  <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider leading-none mb-1.5">
+                    <IconCalendar size={14} stroke={2} className="text-blue-500 shrink-0" />
+                    <span>{lang === "vi" ? "Ngày đặt sân" : "Play date"}</span>
+                  </div>
                   <input
                     type="date"
                     value={availableDate}
                     onChange={(e) => setAvailableDate(e.target.value)}
+                    className="w-full text-xs font-bold text-[var(--text-primary)] cursor-pointer focus:outline-none"
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      padding: 0,
+                      margin: 0,
+                      outline: "none",
+                      boxShadow: "none",
+                      height: "auto",
+                      lineHeight: "1.2",
+                      colorScheme: theme === "dark" ? "dark" : "light",
+                    }}
                   />
-                </label>
-                <label className="availability-filter-field availability-filter-time">
-                  {lang === "vi" ? "Giờ bắt đầu" : "Start time"}
+                </div>
+
+                {/* Segment 2: Giờ bắt đầu (Start time) */}
+                <div className="flex-1 min-w-[130px] px-3.5 py-2.5 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-[var(--surface-card-border)] hover:border-amber-500/50 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20 transition-all cursor-pointer">
+                  <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider leading-none mb-1.5">
+                    <IconClock size={14} stroke={2} className="text-amber-500 shrink-0" />
+                    <span>{lang === "vi" ? "Giờ bắt đầu" : "Start time"}</span>
+                  </div>
                   <input
                     type="time"
                     step={1800}
                     value={availableTime}
                     onChange={(e) => setAvailableTime(e.target.value)}
+                    className="w-full text-xs font-bold text-[var(--text-primary)] cursor-pointer focus:outline-none"
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      padding: 0,
+                      margin: 0,
+                      outline: "none",
+                      boxShadow: "none",
+                      height: "auto",
+                      lineHeight: "1.2",
+                      colorScheme: theme === "dark" ? "dark" : "light",
+                    }}
                   />
-                </label>
-                <label className="availability-filter-field availability-filter-duration">
-                  {lang === "vi" ? "Thời lượng" : "Duration"}
+                </div>
+
+                {/* Segment 3: Thời lượng (Duration) */}
+                <div className="flex-1 min-w-[120px] px-3.5 py-2.5 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-[var(--surface-card-border)] hover:border-purple-500/50 focus-within:border-purple-500 focus-within:ring-2 focus-within:ring-purple-500/20 transition-all cursor-pointer">
+                  <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider leading-none mb-1.5">
+                    <IconHourglass size={14} stroke={2} className="text-purple-500 shrink-0" />
+                    <span>{lang === "vi" ? "Thời lượng" : "Duration"}</span>
+                  </div>
                   <select
                     value={availableDuration}
-                    onChange={(e) =>
-                      setAvailableDuration(Number(e.target.value))
-                    }
+                    onChange={(e) => setAvailableDuration(Number(e.target.value))}
+                    className="w-full text-xs font-bold text-[var(--text-primary)] cursor-pointer focus:outline-none"
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      padding: 0,
+                      margin: 0,
+                      outline: "none",
+                      boxShadow: "none",
+                      height: "auto",
+                      lineHeight: "1.2",
+                    }}
                   >
                     {[30, 60, 120].map((n) => (
-                      <option key={n} value={n}>
+                      <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" key={n} value={n}>
                         {n} {lang === "vi" ? "phút" : "minutes"}
                       </option>
                     ))}
                   </select>
-                </label>
-                <label className="availability-filter-field availability-filter-amenity">
-                  {lang === "vi" ? "Tiện ích" : "Amenities"}
+                </div>
+
+                {/* Segment 4: Tiện ích (Amenities) */}
+                <div className="flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-[var(--surface-card-border)] hover:border-emerald-500/50 focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all cursor-pointer">
+                  <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider leading-none mb-1.5">
+                    <IconSparkles size={14} stroke={2} className="text-emerald-500 shrink-0" />
+                    <span>{lang === "vi" ? "Tiện ích" : "Amenities"}</span>
+                  </div>
                   <select
                     value={selectedAmenity}
                     onChange={(e) => setSelectedAmenity(e.target.value)}
+                    className="w-full text-xs font-bold text-[var(--text-primary)] cursor-pointer focus:outline-none"
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      padding: 0,
+                      margin: 0,
+                      outline: "none",
+                      boxShadow: "none",
+                      height: "auto",
+                      lineHeight: "1.2",
+                    }}
                   >
-                    <option value="ALL">
-                      {lang === "vi" ? "Mọi tiện ích" : "All amenities"}
-                    </option>
-                    <option value="Mái che">
-                      {lang === "vi" ? "Có mái che" : "Covered roof"}
-                    </option>
-                    <option value="Đèn">
-                      {lang === "vi" ? "Đèn chiếu sáng" : "Floodlights"}
-                    </option>
-                    <option value="Đỗ xe">
-                      {lang === "vi" ? "Bãi đỗ ô tô" : "Car parking"}
-                    </option>
-                    <option value="Điều hòa">
-                      {lang === "vi" ? "Điều hòa / Quạt mát" : "Air conditioning"}
-                    </option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="ALL">{lang === "vi" ? "Mọi tiện ích" : "All amenities"}</option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="Mái che">{lang === "vi" ? "Có mái che" : "Covered roof"}</option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="Đèn">{lang === "vi" ? "Đèn chiếu sáng" : "Floodlights"}</option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="Đỗ xe">{lang === "vi" ? "Bãi đỗ ô tô" : "Car parking"}</option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="Điều hòa">{lang === "vi" ? "Điều hòa / Quạt mát" : "Air conditioning"}</option>
                   </select>
-                </label>
-                <label className="availability-filter-field availability-filter-distance">
-                  <span className="distance-filter-heading">
+                </div>
+
+                {/* Segment 5: Khoảng cách (Distance) */}
+                <div className="flex-1 min-w-[140px] px-3.5 py-2.5 rounded-xl bg-black/[0.02] dark:bg-white/[0.03] border border-[var(--surface-card-border)] hover:border-cyan-500/50 focus-within:border-cyan-500 focus-within:ring-2 focus-within:ring-cyan-500/20 transition-all cursor-pointer">
+                  <div className="flex items-center gap-1.5 text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider leading-none mb-1.5">
+                    <IconMapPin size={14} stroke={2} className="text-cyan-600 dark:text-cyan-400 shrink-0" />
                     <span>{lang === "vi" ? "Khoảng cách" : "Distance"}</span>
-                    <strong>
-                      {maxDistance === "ALL"
-                        ? lang === "vi"
-                          ? "Mọi khoảng cách"
-                          : "Any distance"
-                        : `${maxDistance} km`}
-                    </strong>
-                  </span>
-                  <span className="distance-slider-box">
-                    <input
-                      className="custom-distance-slider"
-                      type="range"
-                      min="1"
-                      max="50"
-                      step="1"
-                      value={maxDistance === "ALL" ? 20 : maxDistance}
-                      aria-label={lang === "vi" ? "Khoảng cách tối đa" : "Maximum distance"}
-                      onChange={async (e) => {
-                        const val = e.target.value;
-                        if (!userLocation) {
-                          try {
-                            const loc = await getCurrentPosition();
-                            setUserLocation(loc);
-                          } catch (err) {
-                            showError(err.message || (lang === "vi" ? "Không lấy được vị trí của bạn" : "Could not get your location"));
-                            return;
-                          }
+                  </div>
+                  <select
+                    value={maxDistance}
+                    onChange={async (e) => {
+                      const val = e.target.value;
+                      if (val !== "ALL" && !userLocation) {
+                        try {
+                          const loc = await getCurrentPosition();
+                          setUserLocation(loc);
+                        } catch (err) {
+                          showError(err.message || (lang === "vi" ? "Không lấy được vị trí của bạn" : "Could not get your location"));
+                          return;
                         }
-                        setMaxDistance(val);
-                      }}
-                    />
-                    <span className="distance-val-badge">
-                      {maxDistance === "ALL" ? "20" : maxDistance} km
-                    </span>
-                  </span>
-                </label>
-                <button
-                  className="btn btn-outline"
-                  onClick={() => {
-                    setAvailableDate("");
-                    setAvailableTime("");
-                    setSelectedAmenity("ALL");
-                    setAvailableDuration(60);
-                    setMaxDistance("ALL");
-                  }}
-                >
-                  {lang === "vi" ? "Bỏ lọc" : "Clear filters"}
-                </button>
+                      }
+                      setMaxDistance(val);
+                    }}
+                    className="w-full text-xs font-bold text-[var(--text-primary)] cursor-pointer focus:outline-none"
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      padding: 0,
+                      margin: 0,
+                      outline: "none",
+                      boxShadow: "none",
+                      height: "auto",
+                      lineHeight: "1.2",
+                    }}
+                  >
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="ALL">{lang === "vi" ? "Mọi khoảng cách" : "Any distance"}</option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="5">{lang === "vi" ? "Dưới 5 km" : "Under 5 km"}</option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="10">{lang === "vi" ? "Dưới 10 km" : "Under 10 km"}</option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="20">{lang === "vi" ? "Dưới 20 km" : "Under 20 km"}</option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="30">{lang === "vi" ? "Dưới 30 km" : "Under 30 km"}</option>
+                    <option className="bg-[var(--bg-primary)] text-[var(--text-primary)]" value="50">{lang === "vi" ? "Dưới 50 km" : "Under 50 km"}</option>
+                  </select>
+                </div>
+
+                {/* Reset / Clear filters button */}
+                {(Boolean(availableDate) || Boolean(availableTime) || selectedAmenity !== "ALL" || availableDuration !== 60 || maxDistance !== "ALL") && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAvailableDate("");
+                      setAvailableTime("");
+                      setSelectedAmenity("ALL");
+                      setAvailableDuration(60);
+                      setMaxDistance("ALL");
+                    }}
+                    className="px-3.5 py-2.5 rounded-xl text-xs font-bold text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all flex items-center justify-center gap-1.5 shrink-0 self-stretch md:self-auto cursor-pointer"
+                    title={lang === "vi" ? "Đặt lại bộ lọc" : "Reset filters"}
+                    style={{ minWidth: "92px" }}
+                  >
+                    <IconRefresh size={14} stroke={2} />
+                    <span>{lang === "vi" ? "Đặt lại" : "Reset"}</span>
+                  </button>
+                )}
               </div>
               {!!availableDate !== !!availableTime && (
-                <p>
-                  {lang === "vi"
-                    ? "Chọn cả ngày và giờ để kiểm tra sân trống."
-                    : "Choose both a date and a time to check availability."}
-                </p>
+                <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-xl inline-flex items-center gap-2 mb-4 animate-fade-in">
+                  <span>ℹ️</span>
+                  <span>
+                    {lang === "vi"
+                      ? "Chọn cả ngày và giờ để kiểm tra sân trống."
+                      : "Choose both a date and a time to check availability."}
+                  </span>
+                </div>
               )}
               <AsyncStatus
                 loading={isLoadingVenues}
@@ -731,7 +824,7 @@ export default function App() {
           </ErrorBoundary>
         )}
 
-        {currentTab === "admin" && userProfile?.isAdmin && (
+        {isAdminWorkspace && (
           <ErrorBoundary title="Admin">
             <React.Suspense fallback={<AsyncStatus loading lang={lang} />}>
               <AdminPanel lang={lang} />
@@ -741,7 +834,7 @@ export default function App() {
       </main>
 
       {/* FOOTER */}
-      <footer
+      {!isAdminWorkspace && <footer
         style={{
           background: "var(--bg-secondary)",
           borderTop: "1px solid var(--surface-card-border)",
@@ -930,7 +1023,7 @@ export default function App() {
               : `© ${new Date().getFullYear()} SportSpace. An independent project.`}
           </div>
         </div>
-      </footer>
+      </footer>}
 
       {/* DETAIL MODAL */}
       {detailVenue && (

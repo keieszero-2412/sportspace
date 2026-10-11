@@ -9,13 +9,14 @@
     "test": "node --test functions/test/*.test.js",
     "test:auth": "node --test test/auth.test.mjs",
     "test:profile": "node --test test/profile-data.test.mjs",
-    "test:profile:browser": "node scripts/auth-browser-test.mjs --profile-only",
-    "test:auth:browser": "node scripts/auth-browser-test.mjs",
+    "test:profile:browser": "node scripts/browser/auth-browser-test.mjs --profile-only",
+    "test:auth:browser": "node scripts/browser/auth-browser-test.mjs",
     "test:emulators": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/run-emulator-tests.ps1",
     "preview": "vite preview"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
+    "@tabler/icons-react": "^3.49.0",
     "canvas-confetti": "^1.9.3",
     "cheerio": "^1.2.0",
     "chrome-launcher": "^1.2.2",

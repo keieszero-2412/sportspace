@@ -18,9 +18,12 @@ import {
 } from "lucide-react";
 import { api, watch } from "../services/api";
 import { useToast } from "./ToastContext";
+import SportIcon, { getSportBadgeStyle } from "./SportIcons";
 import AsyncStatus from "./AsyncStatus";
 import GoogleRating from "./GoogleRating";
 import VenuePhone from "./VenuePhone";
+import { venuePriceLabel } from "../utils/venuePrice";
+import { supabase } from "../supabase";
 
 export default function VenueDetailModal({
   venue,
@@ -64,8 +67,11 @@ export default function VenueDetailModal({
       ),
       watch("Reviews", [["facilityId", "==", venue.id]], setReviewsList, fail),
     ];
+    let stopped = false;
     const checkAuth = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
+      if (stopped) return;
+      if (authError && authError.name !== "AuthSessionMissingError") throw authError;
       if (user) {
         const unsubscribe = watch(
           "Bookings",
@@ -82,8 +88,14 @@ export default function VenueDetailModal({
       }
     };
     let unsubs = [];
-    checkAuth().then(u => { if (u) unsubs.push(u) });
+    checkAuth().then(u => {
+      if (u) {
+        if (stopped) u();
+        else unsubs.push(u);
+      }
+    }).catch(e => { if (!stopped) fail(e); });
     return () => {
+      stopped = true;
       stop.forEach((s) => s());
       unsubs.forEach((s) => s());
     };
@@ -141,12 +153,14 @@ export default function VenueDetailModal({
                 "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=800&auto=format&fit=crop";
             }}
           />
-          {(!venue.image || imageFailed) && (
+          {(!venue.image || imageFailed || ['illustrative','candidate'].includes(venue.image_kind || venue.imageKind)) && (
             <span
               className="badge"
               style={{ position: "absolute", top: 10, left: 10, zIndex: 1 }}
             >
-              {lang === "vi" ? "Ảnh minh họa" : "Illustrative image"}
+              {venue.image && !imageFailed && (venue.image_kind || venue.imageKind) === 'candidate'
+                ? (lang === 'vi' ? 'Ảnh nguồn chưa xác minh' : 'Unverified source image')
+                : (lang === "vi" ? "Ảnh minh họa" : "Illustrative image")}
             </span>
           )}
           <div
@@ -192,7 +206,13 @@ export default function VenueDetailModal({
             }}
           >
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 6 }}>
-              <span className="badge badge-sport">{venue.sport}</span>
+              <span
+                className={`badge flex items-center gap-1.5 font-bold shadow-sm ${getSportBadgeStyle(venue.sport)}`}
+                style={{ backdropFilter: "blur(6px)" }}
+              >
+                <SportIcon sport={venue.sport} size={14} stroke={2} />
+                <span>{venue.sport}</span>
+              </span>
               <span className="badge badge-highlight">📍 {vProvince}</span>
               <GoogleRating venue={venue} lang={lang} />
             </div>
@@ -864,7 +884,7 @@ export default function VenueDetailModal({
                 color: "var(--text-primary)",
               }}
             >
-              {venue.price_summary}
+              {venuePriceLabel(venue,lang)}
             </div>
           </div>
           <div style={{ display: "flex", gap: 10 }}>

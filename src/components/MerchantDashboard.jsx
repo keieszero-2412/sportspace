@@ -423,7 +423,7 @@ export default function MerchantDashboard({ lang = "vi", userProfile }) {
                     <button
                       className="btn btn-outline"
                       onClick={() =>
-                        openPrivateImage(b.receiptPath).catch((e) =>
+                        openPrivateImage(b.receiptPath, b.receiptBucket || "sportspace").catch((e) =>
                           showError(e.message),
                         )
                       }

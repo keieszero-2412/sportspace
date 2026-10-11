@@ -6,8 +6,9 @@ function numeric(value) {
 }
 
 export function getGoogleRating(venue = {}) {
-  const rawRating = numeric(venue.google_rating ?? venue.rating);
-  const rawCount = numeric(venue.google_reviews_count ?? venue.reviews_count);
+  const imported = venue.raw_data || {};
+  const rawRating = numeric(venue.google_rating ?? imported.google_rating ?? venue.rating ?? imported.rating);
+  const rawCount = numeric(venue.google_reviews_count ?? imported.google_reviews_count ?? venue.reviews_count ?? imported.reviews_count);
   const rating =
     rawRating !== null && rawRating >= 1 && rawRating <= 5 ? rawRating : null;
   const count =
@@ -23,7 +24,8 @@ export function getGoogleRating(venue = {}) {
       .filter((value) => typeof value === "string" && value.trim())
       .join(", "),
   );
-  if (typeof venue.google_place_id === "string" && venue.google_place_id.trim())
-    url.searchParams.set("query_place_id", venue.google_place_id.trim());
+  const placeId = venue.google_place_id ?? imported.google_place_id;
+  if (typeof placeId === "string" && placeId.trim())
+    url.searchParams.set("query_place_id", placeId.trim());
   return { rating, count, url: url.href };
 }

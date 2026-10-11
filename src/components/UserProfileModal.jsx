@@ -24,6 +24,11 @@ import {
   Building2,
   LogOut,
 } from "lucide-react";
+import SportIcon, {
+  getSportBadgeStyle,
+  getSportPillStyle,
+  getSportTextColor,
+} from "./SportIcons";
 import { useToast } from "./ToastContext";
 import ConfirmModal from "./ConfirmModal";
 import { supabase } from "../supabase";
@@ -108,14 +113,24 @@ export default function UserProfileModal({
   }, [userProfile?.uid]);
 
   React.useEffect(() => {
-    if (!userProfile?.uid || !["bookings", "matches", "credibility"].includes(tab)) return;
+    if (!userProfile?.uid) return;
+    setSectionState(previous => ({ ...previous, matches: { loading: true, error: null } }));
+    return watchProfileRecords(supabase, "matches", userProfile.uid, rows => {
+      setJoinedMatches(rows);
+      setSectionState(previous => ({ ...previous, matches: { loading: false, error: null } }));
+    }, error => {
+      setSectionState(previous => ({ ...previous, matches: { loading: false, error } }));
+    }, { limit: 100 });
+  }, [userProfile?.uid, retry]);
+
+  React.useEffect(() => {
+    if (!userProfile?.uid || !["bookings", "credibility"].includes(tab)) return;
     setSectionState(previous => ({ ...previous, [tab]: { loading: true, error: null } }));
     return watchProfileRecords(supabase, tab, userProfile.uid, rows => {
       if (tab === "bookings") {
         setRecentBookings(rows);
         setHasOlder(rows.length === 100);
-      } else if (tab === "matches") setJoinedMatches(rows);
-      else setEvents(rows);
+      } else setEvents(rows);
       setSectionState(previous => ({ ...previous, [tab]: { loading: false, error: null } }));
     }, error => {
       setSectionState(previous => ({ ...previous, [tab]: { loading: false, error } }));
@@ -195,8 +210,8 @@ export default function UserProfileModal({
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div
               style={{
-                width: 58,
-                height: 58,
+                width: 56,
+                height: 56,
                 borderRadius: "50%",
                 background:
                   "linear-gradient(135deg, var(--btn-primary), var(--highlight))",
@@ -204,18 +219,19 @@ export default function UserProfileModal({
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "1.6rem",
+                fontSize: "1.5rem",
                 fontWeight: 800,
                 boxShadow: "var(--shadow-glow)",
+                flexShrink: 0,
               }}
             >
               {formData.name.charAt(0)}
             </div>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                 <h3
                   style={{
-                    fontSize: "1.25rem",
+                    fontSize: "1.2rem",
                     fontWeight: 800,
                     color: "var(--text-primary)",
                   }}
@@ -224,7 +240,7 @@ export default function UserProfileModal({
                 </h3>
                 <span
                   className="badge badge-highlight"
-                  style={{ fontSize: "0.72rem" }}
+                  style={{ fontSize: "0.7rem", padding: "2px 8px" }}
                 >
                   {lang === "vi"
                     ? "Tài khoản SportSpace"
@@ -236,200 +252,195 @@ export default function UserProfileModal({
                   display: "flex",
                   alignItems: "center",
                   gap: 8,
-                  fontSize: "0.8rem",
+                  fontSize: "0.78rem",
                   color: "var(--text-muted)",
                   marginTop: 2,
+                  flexWrap: "wrap",
                 }}
               >
-                <span>📍 {formData.province}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                  <MapPin size={12} className="text-zinc-400" />
+                  {formData.province}
+                </span>
                 <span>•</span>
                 <span>
                   {lang === "vi" ? "Trình độ:" : "Skill:"}{" "}
-                  <strong>{formData.skillLevel}</strong>
+                  <strong style={{ color: "var(--text-primary)" }}>{formData.skillLevel}</strong>
                 </span>
               </div>
+              {formData.favoriteSports && formData.favoriteSports.length > 0 && (
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 6,
+                    marginTop: 6,
+                  }}
+                >
+                  {formData.favoriteSports.map((s) => (
+                    <span
+                      key={s}
+                      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${getSportBadgeStyle(
+                        s
+                      )}`}
+                    >
+                      <SportIcon sport={s} size={12} stroke={2} />
+                      <span>{s}</span>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
-          <div className="profile-actions">
-            <button
-              type="button"
-              onClick={() => setTab("credibility")}
-              className={`profile-score ${tab === "credibility" ? "is-active" : ""}`}
-              title={lang === "vi" ? "Xem điểm uy tín" : "View credibility score"}
-            >
-              <ShieldCheck size={16} />
-              <span className="profile-score-label">
-                {lang === "vi" ? "Uy tín" : "Score"}
-              </span>
-              <strong>{userProfile?.credibilityScore ?? 100}</strong>
-              <small>/100</small>
-            </button>
-            {userProfile?.role === "merchant" ? (
+          <div className="profile-header-right">
+            <div className="profile-actions">
               <button
-                onClick={() => {
-                  onClose();
-                  onSwitchToMerchant();
-                }}
-                className="btn btn-secondary"
-                title={
-                  lang === "vi"
-                    ? "Chuyển sang Quản trị viên Chủ sân"
-                    : "Switch to Merchant Portal"
-                }
+                type="button"
+                onClick={() => setTab("credibility")}
+                className={`profile-action-btn profile-score-btn ${tab === "credibility" ? "is-active" : ""}`}
+                title={lang === "vi" ? "Xem điểm uy tín" : "View credibility score"}
               >
-                <Building2 size={14} />
-                <span>
-                  {lang === "vi" ? "Cổng Chủ Sân" : "Merchant Portal"}
-                </span>
+                <ShieldCheck size={15} />
+                <span>{lang === "vi" ? "Uy tín" : "Score"}</span>
+                <strong>{userProfile?.credibilityScore ?? 100}</strong>
+                <small>/100</small>
               </button>
-            ) : (
-              <button
-                onClick={() => {
-                  setApplying(true);
-                }}
-                className="btn"
-                style={{
-                  background: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
-                  color: "#FFF",
-                  border: "none",
-                }}
-                title={
-                  lang === "vi"
-                    ? "Đăng ký đối tác Chủ sân"
-                    : "Apply for Merchant Partner"
-                }
-              >
-                <Award size={14} />
-                <span>
-                  {lang === "vi"
-                    ? "Đăng ký làm Chủ sân"
-                    : "Apply as Venue Owner"}
-                </span>
-              </button>
-            )}
 
-            <button
-              disabled={busy}
-              onClick={async () => {
-                if (busy) return;
-                setBusy(true);
-                try {
-                  await onLogout();
-                  showSuccess(lang === "vi" ? "Đã đăng xuất." : "Logged out.");
-                } catch (e) {
-                  showError(e.message);
-                } finally {
-                  setBusy(false);
-                }
-              }}
-              className="btn"
-              style={{
-                background: "rgba(239, 68, 68, 0.1)",
-                color: "#EF4444",
-                border: "1px solid rgba(239, 68, 68, 0.3)",
-                whiteSpace: "nowrap"
-              }}
-              title={lang === "vi" ? "Đăng xuất" : "Log Out"}
-            >
-              <LogOut size={14} />
-              <span>{lang === "vi" ? "Đăng xuất" : "Log Out"}</span>
-            </button>
+              {userProfile?.role === "merchant" ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onSwitchToMerchant();
+                  }}
+                  className="profile-action-btn profile-partner-btn"
+                  title={
+                    lang === "vi"
+                      ? "Chuyển sang Quản trị viên Chủ sân"
+                      : "Switch to Merchant Portal"
+                  }
+                >
+                  <Building2 size={15} />
+                  <span>
+                    {lang === "vi" ? "Cổng Chủ Sân" : "Merchant Portal"}
+                  </span>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setApplying(true)}
+                  className="profile-action-btn profile-partner-btn"
+                  title={
+                    lang === "vi"
+                      ? "Đăng ký đối tác Chủ sân"
+                      : "Apply for Merchant Partner"
+                  }
+                >
+                  <Award size={15} />
+                  <span>
+                    {lang === "vi"
+                      ? "Đăng ký Chủ sân"
+                      : "Apply as Venue Owner"}
+                  </span>
+                </button>
+              )}
+
+              <button
+                type="button"
+                disabled={busy}
+                onClick={async () => {
+                  if (busy) return;
+                  setBusy(true);
+                  try {
+                    await onLogout();
+                    showSuccess(lang === "vi" ? "Đã đăng xuất." : "Logged out.");
+                  } catch (e) {
+                    showError(e.message);
+                  } finally {
+                    setBusy(false);
+                  }
+                }}
+                className="profile-action-btn profile-logout-btn"
+                title={lang === "vi" ? "Đăng xuất" : "Log Out"}
+              >
+                <LogOut size={15} />
+                <span>{lang === "vi" ? "Đăng xuất" : "Log Out"}</span>
+              </button>
+            </div>
 
             <button
               aria-label={lang === "vi" ? "Đóng hồ sơ" : "Close profile"}
               onClick={onClose}
-              className="btn btn-outline profile-close"
+              className="profile-close-btn"
+              title={lang === "vi" ? "Đóng" : "Close"}
             >
-              <X size={20} />
+              <X size={18} />
             </button>
           </div>
         </div>
 
         {/* Tabs Navigation */}
-        <div
-          className="profile-tabs"
-          style={{
-            display: "flex",
-            gap: 8,
-            borderBottom: "1px solid var(--surface-card-border)",
-            paddingBottom: 8,
-            marginBottom: 18,
-            overflowX: "auto",
-          }}
-        >
+        <div className="profile-tabs-nav" role="tablist">
           <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "bookings"}
             onClick={() => setTab("bookings")}
-            className={`btn ${tab === "bookings" ? "btn-primary" : "btn-outline"}`}
-            style={{
-              padding: "6px 14px",
-              fontSize: "0.82rem",
-              whiteSpace: "nowrap",
-            }}
+            className={`profile-tab-pill ${tab === "bookings" ? "is-active" : ""}`}
           >
             <Calendar size={14} />
             <span>
-              {lang === "vi"
-                ? `Lịch sử đặt sân (${userBookings.length})`
-                : `Booking History (${userBookings.length})`}
+              {lang === "vi" ? "Lịch sử đặt sân" : "Booking History"}
             </span>
+            <span className="profile-tab-chip">{userBookings.length}</span>
           </button>
 
           <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "saved"}
             onClick={() => setTab("saved")}
-            className={`btn ${tab === "saved" ? "btn-primary" : "btn-outline"}`}
-            style={{
-              padding: "6px 14px",
-              fontSize: "0.82rem",
-              whiteSpace: "nowrap",
-            }}
+            className={`profile-tab-pill ${tab === "saved" ? "is-active" : ""}`}
           >
             <Heart size={14} />
             <span>
-              {lang === "vi"
-                ? `Sân đã lưu (${savedVenues.length})`
-                : `Saved Venues (${savedVenues.length})`}
+              {lang === "vi" ? "Sân đã lưu" : "Saved Venues"}
             </span>
+            <span className="profile-tab-chip">{savedVenues.length}</span>
           </button>
 
           <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "matches"}
             onClick={() => setTab("matches")}
-            className={`btn ${tab === "matches" ? "btn-primary" : "btn-outline"}`}
-            style={{
-              padding: "6px 14px",
-              fontSize: "0.82rem",
-              whiteSpace: "nowrap",
-            }}
+            className={`profile-tab-pill ${tab === "matches" ? "is-active" : ""}`}
           >
             <Trophy size={14} />
             <span>
-              {lang === "vi"
-                ? `Kèo giao lưu (${joinedMatches.length})`
-                : `Matches (${joinedMatches.length})`}
+              {lang === "vi" ? "Kèo giao lưu" : "Matches"}
             </span>
+            <span className="profile-tab-chip">{joinedMatches.length}</span>
           </button>
 
           <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "credibility"}
             onClick={() => setTab("credibility")}
-            className={`btn ${tab === "credibility" ? "btn-primary" : "btn-outline"}`}
-            style={{
-              padding: "6px 14px",
-              fontSize: "0.82rem",
-              whiteSpace: "nowrap",
-            }}
+            className={`profile-tab-pill ${tab === "credibility" ? "is-active" : ""}`}
           >
             <Award size={14} />
             <span>{lang === "vi" ? "Điểm uy tín" : "Credibility"}</span>
           </button>
 
           <button
+            type="button"
+            role="tab"
+            aria-selected={tab === "info"}
             onClick={() => setTab("info")}
-            className={`btn ${tab === "info" ? "btn-primary" : "btn-outline"}`}
-            style={{
-              padding: "6px 14px",
-              fontSize: "0.82rem",
-              whiteSpace: "nowrap",
-            }}
+            className={`profile-tab-pill ${tab === "info" ? "is-active" : ""}`}
           >
             <User size={14} />
             <span>{lang === "vi" ? "Thông tin cá nhân" : "Personal Info"}</span>
@@ -461,7 +472,7 @@ export default function UserProfileModal({
                       display: "flex",
                       justifyContent: "space-between",
                       alignItems: "center",
-                      marginBottom: 6,
+                      marginBottom: 8,
                     }}
                   >
                     <strong
@@ -473,8 +484,8 @@ export default function UserProfileModal({
                       {b.venueName}
                     </strong>
                     <span
-                      className="badge badge-highlight"
-                      style={{ fontSize: "0.7rem", overflowWrap: "anywhere" }}
+                      className="badge badge-highlight font-mono"
+                      style={{ fontSize: "0.72rem", overflowWrap: "anywhere", padding: "2px 8px" }}
                     >
                       {b.ticketId || b.id}
                     </span>
@@ -484,17 +495,27 @@ export default function UserProfileModal({
                     style={{
                       color: "var(--text-muted)",
                       fontSize: "0.82rem",
-                      marginBottom: 8,
+                      marginBottom: 10,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      flexWrap: "wrap",
                     }}
                   >
-                    🏟️ <strong>{b.courtName}</strong> • 🕒 {b.time} (
-                    {b.date === "Hôm nay"
-                      ? lang === "vi"
-                        ? "Hôm nay"
-                        : "Today"
-                      : b.date}
-                    ) • {lang === "vi" ? "Thanh toán:" : "Payment:"}{" "}
-                    <strong>{b.paymentMethod}</strong>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      <Building2 size={13} className="text-zinc-400" />
+                      <strong>{b.courtName}</strong>
+                    </span>
+                    <span>•</span>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+                      <Clock size={13} className="text-zinc-400" />
+                      {b.time} ({b.date === "Hôm nay" ? (lang === "vi" ? "Hôm nay" : "Today") : b.date})
+                    </span>
+                    <span>•</span>
+                    <span>
+                      {lang === "vi" ? "Thanh toán:" : "Payment:"}{" "}
+                      <strong>{b.paymentMethod}</strong>
+                    </span>
                   </div>
 
                   <div
@@ -519,19 +540,31 @@ export default function UserProfileModal({
                           ? "Đã xác minh nhận: "
                           : "Verified received: "}
                       </span>
-                      <strong style={{ color: "var(--accent-orange)" }}>
+                      <strong style={{ color: "var(--accent-orange, #d97706)", fontSize: "0.95rem" }}>
                         {Number(b.depositPaid || 0).toLocaleString()}đ
                       </strong>
                     </div>
 
-                    <div>
-                      <span>{bookingLabel(b, lang)}</span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span
+                        style={{
+                          fontSize: "0.78rem",
+                          fontWeight: 600,
+                          padding: "3px 8px",
+                          borderRadius: 8,
+                          background: "rgba(0, 0, 0, 0.04)",
+                        }}
+                      >
+                        {bookingLabel(b, lang)}
+                      </span>
                       {b.schemaVersion === 2 &&
                         ["held", "pending_approval", "confirmed"].includes(
                           b.status,
                         ) && (
                           <button
+                            type="button"
                             className="btn btn-outline"
+                            style={{ padding: "5px 12px", fontSize: "0.78rem", borderRadius: 10 }}
                             disabled={busy}
                             onClick={() => handleRequestCancel(b.id)}
                           >
@@ -542,7 +575,9 @@ export default function UserProfileModal({
                         b.startAt <= Date.now() &&
                         !b.attendanceConfirmedAt && (
                           <button
+                            type="button"
                             className="btn btn-outline"
+                            style={{ padding: "5px 12px", fontSize: "0.78rem", borderRadius: 10 }}
                             disabled={busy}
                             onClick={() =>
                               api("confirmAttendance", { bookingId: b.id })
@@ -584,7 +619,7 @@ export default function UserProfileModal({
                   <Heart
                     size={36}
                     color="var(--text-muted)"
-                    style={{ margin: "0 auto 10px" }}
+                    style={{ margin: "0 auto 10px", opacity: 0.5 }}
                   />
                   <h4 style={{ fontWeight: 700 }}>
                     {lang === "vi"
@@ -609,9 +644,10 @@ export default function UserProfileModal({
                         alignItems: "center",
                         justifyContent: "space-between",
                         background: "var(--surface-card)",
-                        borderRadius: "12px",
-                        padding: "12px 16px",
+                        borderRadius: "14px",
+                        padding: "14px 18px",
                         border: "1px solid var(--surface-card-border)",
+                        gap: 12,
                       }}
                     >
                       <div>
@@ -619,14 +655,15 @@ export default function UserProfileModal({
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: 6,
+                            gap: 8,
                           }}
                         >
                           <span
-                            className="badge badge-sport"
-                            style={{ fontSize: "0.68rem" }}
+                            className={`badge flex items-center gap-1 font-bold ${getSportBadgeStyle(venue.sport)}`}
+                            style={{ fontSize: "0.7rem", padding: "2px 8px" }}
                           >
-                            {venue.sport}
+                            <SportIcon sport={venue.sport} size={11} stroke={2} />
+                            <span>{venue.sport}</span>
                           </span>
                           <strong
                             style={{
@@ -641,12 +678,21 @@ export default function UserProfileModal({
                           style={{
                             fontSize: "0.78rem",
                             color: "var(--text-muted)",
-                            marginTop: 2,
+                            marginTop: 4,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 6,
                           }}
                         >
-                          📍 {venue.address || venue.province} • 🏟️{" "}
-                          {venue.scale_courts}{" "}
-                          {lang === "vi" ? "sân con" : "courts"}
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                            <MapPin size={12} className="text-zinc-400" />
+                            {venue.address || venue.province}
+                          </span>
+                          <span>•</span>
+                          <span>
+                            {venue.scale_courts}{" "}
+                            {lang === "vi" ? "sân con" : "courts"}
+                          </span>
                         </div>
                       </div>
 
@@ -655,24 +701,27 @@ export default function UserProfileModal({
                           display: "flex",
                           gap: 8,
                           alignItems: "center",
+                          flexShrink: 0,
                         }}
                       >
                         <button
+                          type="button"
                           onClick={() => {
                             onClose();
                             onBookNow(venue);
                           }}
                           className="btn btn-primary"
-                          style={{ padding: "6px 12px", fontSize: "0.78rem" }}
+                          style={{ padding: "6px 14px", fontSize: "0.78rem", borderRadius: 10 }}
                         >
                           {lang === "vi" ? "Đặt sân" : "Book"}
                         </button>
                         <button
+                          type="button"
                           onClick={() => {
                             onRemoveSavedVenue(venue.id);
                           }}
                           className="btn btn-outline"
-                          style={{ padding: "6px 10px", color: "#DC2626" }}
+                          style={{ padding: "6px 10px", color: "#DC2626", borderRadius: 10 }}
                           title={lang === "vi" ? "Bỏ lưu" : "Remove"}
                         >
                           <Trash2 size={14} />
@@ -695,38 +744,105 @@ export default function UserProfileModal({
                   key={m.id}
                   style={{
                     background: "var(--surface-card)",
-                    borderRadius: "12px",
-                    padding: "14px",
+                    borderRadius: "14px",
+                    padding: "14px 16px",
                     border: "1px solid var(--surface-card-border)",
                     fontSize: "0.85rem",
                   }}
                 >
-                  <div style={{ fontWeight: 800, marginBottom: 4 }}>
-                    {m.title}
-                  </div>
                   <div
-                    style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: 8,
+                    }}
                   >
-                    📍 {m.venueName} • 🕒 {m.time}
+                    <span
+                      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold border ${getSportBadgeStyle(
+                        m.sport
+                      )}`}
+                    >
+                      <SportIcon sport={m.sport} size={13} stroke={2} />
+                      <span>{m.sport}</span>
+                    </span>
+
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        fontSize: "0.72rem",
+                        fontWeight: 600,
+                        padding: "2px 8px",
+                        borderRadius: 9999,
+                        background: "rgba(34, 197, 94, 0.1)",
+                        color: "#16a34a",
+                        border: "1px solid rgba(34, 197, 94, 0.2)",
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 6,
+                          height: 6,
+                          borderRadius: "50%",
+                          background: "#16a34a",
+                        }}
+                      />
+                      {m.status}
+                    </span>
                   </div>
+
+                  <div
+                    style={{
+                      color: "var(--text-muted)",
+                      fontSize: "0.8rem",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 3,
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 5, color: "var(--text-primary)", fontWeight: 500 }}>
+                      <MapPin size={13} className="text-zinc-400" />
+                      <span>{m.venueName}</span>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                      <Clock size={13} className="text-zinc-400" />
+                      <span>{m.date} {m.time}</span>
+                    </div>
+                  </div>
+
                   <div
                     style={{
                       display: "flex",
                       justifyContent: "space-between",
-                      marginTop: 6,
+                      alignItems: "center",
+                      marginTop: 10,
+                      paddingTop: 8,
+                      borderTop: "1px solid var(--surface-card-border)",
                       fontSize: "0.78rem",
                     }}
                   >
                     <span
                       style={{
-                        color: "var(--btn-primary-hover)",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        color: m.hostId === userProfile?.uid ? "var(--accent-orange, #d97706)" : "#16a34a",
                         fontWeight: 700,
                       }}
                     >
-                      {m.role}
-                    </span>
-                    <span style={{ color: "#16A34A", fontWeight: 700 }}>
-                      ● {m.status}
+                      {m.hostId === userProfile?.uid ? (
+                        <>
+                          <Award size={13} />
+                          <span>{lang === "vi" ? "Chủ kèo" : "Host"}</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 size={13} />
+                          <span>{lang === "vi" ? "Đã tham gia" : "Joined"}</span>
+                        </>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -741,55 +857,65 @@ export default function UserProfileModal({
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div
                 style={{
-                  background: "var(--bg-primary)",
+                  background: "var(--surface-card)",
                   padding: "16px",
-                  borderRadius: "12px",
+                  borderRadius: "14px",
                   border: "1px solid var(--surface-card-border)",
                 }}
               >
-                <h4
-                  style={{
-                    fontSize: "0.95rem",
-                    fontWeight: 800,
-                    marginBottom: 8,
-                    color: "var(--text-primary)",
-                  }}
-                >
-                  {lang === "vi"
-                    ? "Quy Tắc Tính Điểm Uy Tín SportSpace:"
-                    : "SportSpace Credibility Scoring Rules:"}
-                </h4>
-                <p>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                  <ShieldCheck size={18} color="#16a34a" />
+                  <h4
+                    style={{
+                      fontSize: "0.95rem",
+                      fontWeight: 800,
+                      color: "var(--text-primary)",
+                      margin: 0,
+                    }}
+                  >
+                    {lang === "vi"
+                      ? "Quy Tắc Tính Điểm Uy Tín SportSpace:"
+                      : "SportSpace Credibility Scoring Rules:"}
+                  </h4>
+                </div>
+                <p style={{ fontSize: "0.82rem", color: "var(--text-muted)", margin: "0 0 10px 0" }}>
                   {lang === "vi"
                     ? "Điểm chỉ thay đổi theo sự kiện tham dự đã xác minh. Không tự trừ điểm vì đã qua giờ."
                     : "Scores change only for verified attendance events; time passing alone does not deduct points."}
                 </p>
-                {events.map((e) => (
-                  <p key={e.id}>
-                    {e.delta > 0 ? "+" : ""}
-                    {e.delta} · {e.reason}
-                  </p>
-                ))}
+                {events.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingTop: 8, borderTop: "1px solid var(--surface-card-border)" }}>
+                    {events.map((e) => (
+                      <div key={e.id} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem" }}>
+                        <span style={{ color: "var(--text-muted)" }}>{e.reason}</span>
+                        <strong style={{ color: e.delta > 0 ? "#16a34a" : "#ef4444" }}>
+                          {e.delta > 0 ? "+" : ""}{e.delta}
+                        </strong>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",
-                  gap: 10,
+                  gap: 12,
                 }}
               >
                 <div
                   style={{
-                    padding: "14px",
+                    padding: "16px",
                     background: "var(--surface-card)",
-                    borderRadius: "10px",
+                    borderRadius: "14px",
                     textAlign: "center",
+                    border: "1px solid var(--surface-card-border)",
                   }}
                 >
                   <div
                     style={{
-                      fontSize: "1.4rem",
+                      fontSize: "1.6rem",
                       fontWeight: 900,
                       color: "#16A34A",
                     }}
@@ -797,7 +923,7 @@ export default function UserProfileModal({
                     {events.length}
                   </div>
                   <div
-                    style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}
+                    style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}
                   >
                     {lang === "vi"
                       ? "Sự kiện tham dự đã xác minh"
@@ -806,23 +932,24 @@ export default function UserProfileModal({
                 </div>
                 <div
                   style={{
-                    padding: "14px",
+                    padding: "16px",
                     background: "var(--surface-card)",
-                    borderRadius: "10px",
+                    borderRadius: "14px",
                     textAlign: "center",
+                    border: "1px solid var(--surface-card-border)",
                   }}
                 >
                   <div
                     style={{
-                      fontSize: "1.4rem",
+                      fontSize: "1.6rem",
                       fontWeight: 900,
-                      color: "var(--btn-primary-hover)",
+                      color: "var(--text-muted)",
                     }}
                   >
-                    {lang === "vi" ? "Chưa xác minh" : "Unverified"}
+                    0
                   </div>
                   <div
-                    style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}
+                    style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: 4 }}
                   >
                     {lang === "vi"
                       ? "Vi phạm bùng lịch hẹn"
@@ -841,10 +968,12 @@ export default function UserProfileModal({
               className="booking-flow"
               onSubmit={handleSaveProfile}
               onChange={() => setIsEditing(true)}
-              style={{ display: "flex", flexDirection: "column", gap: 12 }}
+              style={{ display: "flex", flexDirection: "column", gap: 14 }}
             >
               <label>
-                {lang === "vi" ? "Ngôn ngữ mặc định" : "Preferred language"}
+                <span style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, marginBottom: 4, color: "var(--text-muted)" }}>
+                  {lang === "vi" ? "Ngôn ngữ mặc định" : "Preferred language"}
+                </span>
                 <select
                   value={formData.preferredLanguage}
                   onChange={(e) =>
@@ -853,14 +982,32 @@ export default function UserProfileModal({
                       preferredLanguage: e.target.value,
                     })
                   }
+                  style={{
+                    width: "100%",
+                    padding: "9px 12px",
+                    borderRadius: "10px",
+                    border: "1px solid var(--surface-card-border)",
+                    background: "var(--bg-primary)",
+                    color: "var(--text-primary)",
+                    fontSize: "0.85rem",
+                  }}
                 >
                   <option value="vi">Tiếng Việt</option>
                   <option value="en">English</option>
                 </select>
               </label>
-              <label>
-                {lang === "vi" ? "Môn thể thao yêu thích" : "Favorite sports"}
-                <div className="form-row">
+
+              <div>
+                <span style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, marginBottom: 6, color: "var(--text-muted)" }}>
+                  {lang === "vi" ? "Môn thể thao yêu thích" : "Favorite sports"}
+                </span>
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 8,
+                  }}
+                >
                   {[
                     "Pickleball",
                     "Bóng đá",
@@ -869,25 +1016,38 @@ export default function UserProfileModal({
                     "Bóng rổ",
                     "Bóng bàn",
                     "Bóng chuyền",
-                  ].map((s) => (
-                    <label key={s}>
-                      <input
-                        type="checkbox"
-                        checked={formData.favoriteSports.includes(s)}
-                        onChange={(e) =>
-                          setFormData({
-                            ...formData,
-                            favoriteSports: e.target.checked
-                              ? [...formData.favoriteSports, s]
-                              : formData.favoriteSports.filter((v) => v !== s),
-                          })
-                        }
-                      />{" "}
-                      {s}
-                    </label>
-                  ))}
+                  ].map((s) => {
+                    const isChecked = formData.favoriteSports.includes(s);
+                    return (
+                      <label
+                        key={s}
+                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold cursor-pointer transition-all select-none ${
+                          isChecked
+                            ? getSportPillStyle(s, true)
+                            : `${getSportBadgeStyle(s)} opacity-80 hover:opacity-100`
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              favoriteSports: e.target.checked
+                                ? [...formData.favoriteSports, s]
+                                : formData.favoriteSports.filter((v) => v !== s),
+                            })
+                          }
+                          className="sr-only"
+                        />
+                        <SportIcon sport={s} size={15} stroke={2} />
+                        <span>{s}</span>
+                      </label>
+                    );
+                  })}
                 </div>
-              </label>
+              </div>
+
               <div
                 style={{
                   display: "grid",
@@ -902,6 +1062,7 @@ export default function UserProfileModal({
                       fontSize: "0.78rem",
                       fontWeight: 700,
                       marginBottom: 4,
+                      color: "var(--text-muted)",
                     }}
                   >
                     {lang === "vi" ? "Họ và tên:" : "Full Name:"}
@@ -914,8 +1075,8 @@ export default function UserProfileModal({
                     }
                     style={{
                       width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: "8px",
+                      padding: "9px 12px",
+                      borderRadius: "10px",
                       border: "1px solid var(--surface-card-border)",
                       background: "var(--bg-primary)",
                       color: "var(--text-primary)",
@@ -931,6 +1092,7 @@ export default function UserProfileModal({
                       fontSize: "0.78rem",
                       fontWeight: 700,
                       marginBottom: 4,
+                      color: "var(--text-muted)",
                     }}
                   >
                     {lang === "vi" ? "Số điện thoại:" : "Phone Number:"}
@@ -943,8 +1105,8 @@ export default function UserProfileModal({
                     }
                     style={{
                       width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: "8px",
+                      padding: "9px 12px",
+                      borderRadius: "10px",
                       border: "1px solid var(--surface-card-border)",
                       background: "var(--bg-primary)",
                       color: "var(--text-primary)",
@@ -961,6 +1123,7 @@ export default function UserProfileModal({
                     fontSize: "0.78rem",
                     fontWeight: 700,
                     marginBottom: 4,
+                    color: "var(--text-muted)",
                   }}
                 >
                   {lang === "vi"
@@ -976,12 +1139,14 @@ export default function UserProfileModal({
                   }
                   style={{
                     width: "100%",
-                    padding: "8px 12px",
-                    borderRadius: "8px",
+                    padding: "9px 12px",
+                    borderRadius: "10px",
                     border: "1px solid var(--surface-card-border)",
                     background: "var(--bg-primary)",
                     color: "var(--text-primary)",
                     fontSize: "0.85rem",
+                    opacity: 0.7,
+                    cursor: "not-allowed",
                   }}
                 />
               </div>
@@ -1000,6 +1165,7 @@ export default function UserProfileModal({
                       fontSize: "0.78rem",
                       fontWeight: 700,
                       marginBottom: 4,
+                      color: "var(--text-muted)",
                     }}
                   >
                     {lang === "vi" ? "Khu vực sinh sống:" : "City / Province:"}
@@ -1012,8 +1178,8 @@ export default function UserProfileModal({
                     }
                     style={{
                       width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: "8px",
+                      padding: "9px 12px",
+                      borderRadius: "10px",
                       border: "1px solid var(--surface-card-border)",
                       background: "var(--bg-primary)",
                       color: "var(--text-primary)",
@@ -1029,6 +1195,7 @@ export default function UserProfileModal({
                       fontSize: "0.78rem",
                       fontWeight: 700,
                       marginBottom: 4,
+                      color: "var(--text-muted)",
                     }}
                   >
                     {lang === "vi"
@@ -1042,8 +1209,8 @@ export default function UserProfileModal({
                     }
                     style={{
                       width: "100%",
-                      padding: "8px 12px",
-                      borderRadius: "8px",
+                      padding: "9px 12px",
+                      borderRadius: "10px",
                       border: "1px solid var(--surface-card-border)",
                       background: "var(--bg-primary)",
                       color: "var(--text-primary)",
@@ -1072,31 +1239,34 @@ export default function UserProfileModal({
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={busy}
-                className="btn btn-primary"
-                style={{ marginTop: 8, padding: "10px", fontSize: "0.88rem" }}
-              >
-                <Save size={16} />{" "}
-                {lang === "vi" ? "Lưu thay đổi hồ sơ" : "Save Profile Changes"}
-              </button>
+              <div style={{ display: "flex", gap: 10, marginTop: 6, flexWrap: "wrap", alignItems: "center" }}>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="btn btn-primary"
+                  style={{ padding: "10px 18px", fontSize: "0.85rem", borderRadius: 12 }}
+                >
+                  <Save size={15} />{" "}
+                  {lang === "vi" ? "Lưu thay đổi hồ sơ" : "Save Profile Changes"}
+                </button>
 
-              <button
-                type="button"
-                onClick={() => setShowDeleteConfirm(true)}
-                className="btn btn-outline"
-                style={{
-                  marginTop: 8,
-                  padding: "10px",
-                  fontSize: "0.88rem",
-                  color: "#DC2626",
-                  borderColor: "#DC2626",
-                }}
-              >
-                <Trash2 size={16} />{" "}
-                {lang === "vi" ? "Xóa tài khoản" : "Delete Account"}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="btn btn-outline"
+                  style={{
+                    padding: "10px 16px",
+                    fontSize: "0.85rem",
+                    color: "#DC2626",
+                    borderColor: "rgba(220, 38, 38, 0.3)",
+                    borderRadius: 12,
+                    marginLeft: "auto",
+                  }}
+                >
+                  <Trash2 size={15} />{" "}
+                  {lang === "vi" ? "Xóa tài khoản" : "Delete Account"}
+                </button>
+              </div>
             </form>
           )}
         </div>
@@ -1104,6 +1274,7 @@ export default function UserProfileModal({
         {tab === "bookings" && hasOlder && recentBookings.length >= 100 && (
           <button
             className="btn btn-outline"
+            style={{ margin: "10px auto 0", padding: "8px 16px", borderRadius: 10, fontSize: "0.82rem" }}
             disabled={busy}
             onClick={loadOlder}
           >

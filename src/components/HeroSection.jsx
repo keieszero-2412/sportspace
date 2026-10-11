@@ -22,6 +22,7 @@ import {
   User,
   CheckCircle2,
 } from "lucide-react";
+import SportIcon, { getSportBadgeStyle } from "./SportIcons";
 
 export default function HeroSection({
   // Search & Filters integration
@@ -53,6 +54,7 @@ export default function HeroSection({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeNav, setActiveNav] = useState("home"); // 'home' | 'venues' | 'matches' | 'merchant' | 'account'
+  const [showFixtures, setShowFixtures] = useState(true);
 
   const [isProvinceDropdownOpen, setIsProvinceDropdownOpen] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState("bottom");
@@ -613,30 +615,48 @@ export default function HeroSection({
                   : "Smart sports platform with online court booking and verified matchmaking with attendance tracking."}
               </p>
 
-              {/* Tiêu đề phụ: "KÈO GHÉP TRẬN MỚI NHẤT" + Icon mũi tên */}
+              {/* Tiêu đề phụ: "KÈO GHÉP TRẬN MỚI NHẤT" + Icon mũi tên toggle thu gọn/mở rộng */}
               <div className="pt-2">
-                <div
-                  onClick={() => setCurrentTab("matchmaking")}
-                  className="inline-flex items-center gap-3 text-white font-extrabold text-sm sm:text-base tracking-widest uppercase cursor-pointer select-none group"
-                >
-                  <span>
-                    {lang === "vi"
-                      ? "KÈO GHÉP TRẬN MỚI NHẤT"
-                      : "LATEST MATCH FIXTURES"}
-                  </span>
-                  <div
-                    className="w-7 h-7 rounded-full flex items-center justify-center border shadow-inner transition-all duration-200"
-                    style={{
-                      backgroundColor: "rgba(255, 255, 255, 0.2)",
-                      borderColor: "rgba(255, 255, 255, 0.4)",
-                    }}
+                <div className="flex items-center justify-between gap-3 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => setShowFixtures((prev) => !prev)}
+                    className="inline-flex items-center gap-3 text-white font-extrabold text-sm sm:text-base tracking-widest uppercase cursor-pointer select-none group bg-transparent border-0 p-0 text-left focus:outline-none"
+                    title={
+                      showFixtures
+                        ? (lang === "vi" ? "Thu gọn danh sách kèo" : "Collapse match fixtures")
+                        : (lang === "vi" ? "Mở rộng danh sách kèo" : "Expand match fixtures")
+                    }
                   >
-                    <ChevronRight className="w-4 h-4 text-white group-hover:translate-x-0.5 transition-transform" />
-                  </div>
+                    <span>
+                      {lang === "vi"
+                        ? "KÈO GHÉP TRẬN MỚI NHẤT"
+                        : "LATEST MATCH FIXTURES"}
+                    </span>
+                    <div
+                      className="w-7 h-7 rounded-full flex items-center justify-center border shadow-inner transition-all duration-200 group-hover:scale-110 group-hover:bg-white/30"
+                      style={{
+                        backgroundColor: "rgba(255, 255, 255, 0.2)",
+                        borderColor: "rgba(255, 255, 255, 0.4)",
+                      }}
+                    >
+                      <ChevronRight
+                        className={`w-4 h-4 text-white transition-transform duration-300 ${
+                          showFixtures ? "rotate-90" : "rotate-0"
+                        }`}
+                      />
+                    </div>
+                  </button>
                 </div>
 
                 {/* Danh sách 2 Card Glassmorphism (#D9F0FF ở Light Mode / #3E5BA3 ở Dark Mode theo README.md) */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                <div
+                  className={`grid grid-cols-1 sm:grid-cols-2 gap-4 transition-all duration-300 ease-in-out overflow-hidden ${
+                    showFixtures
+                      ? "mt-4 max-h-[1200px] opacity-100"
+                      : "max-h-0 opacity-0 mt-0 pointer-events-none"
+                  }`}
+                >
                   {latestMatches
                     .filter(
                       (m) =>
@@ -682,18 +702,12 @@ export default function HeroSection({
                           <div className="space-y-1.5">
                             <div className="flex items-center justify-center gap-1.5">
                               <span
-                                className="text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full border shadow-xs"
-                                style={{
-                                  backgroundColor: isDark
-                                    ? "rgba(12, 45, 69, 0.7)"
-                                    : "rgba(255, 253, 247, 0.85)",
-                                  color: isDark ? "#E6FBDA" : "#0E2841",
-                                  borderColor: isDark
-                                    ? "rgba(132, 209, 117, 0.4)"
-                                    : "rgba(137, 185, 230, 0.4)",
-                                }}
+                                className={`text-[11px] font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full border shadow-xs inline-flex items-center gap-1.5 ${getSportBadgeStyle(
+                                  m.sport
+                                )}`}
                               >
-                                {m.sportIcon} {m.sport}
+                                <SportIcon sport={m.sport} size={13} stroke={2} />
+                                <span>{m.sport}</span>
                               </span>
                             </div>
 
@@ -715,7 +729,7 @@ export default function HeroSection({
                                 justifyContent: "center",
                               }}
                             >
-                              {(lang === "vi" ? raw.titleVi : raw.titleEn) || m.title || m.venue}
+                              {m.sport}
                             </h4>
 
                             {/* Venue Name & District */}

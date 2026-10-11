@@ -4,6 +4,7 @@ import { getVenuePhone } from "../services/venuePhone";
 
 export default function VenuePhone({ venue, lang = "vi", detail = false }) {
   const contact = getVenuePhone(venue);
+  if (venue?.phone_status === 'hidden_no_source') return null;
   return (
     <div className="venue-phone" data-phone-status={contact ? "sourced" : "unverified"}>
       <Phone size={14} aria-hidden="true" style={{ flexShrink: 0 }} />

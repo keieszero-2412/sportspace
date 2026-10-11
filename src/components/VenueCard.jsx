@@ -8,6 +8,8 @@ import {
 } from "lucide-react";
 import GoogleRating from "./GoogleRating";
 import VenuePhone from "./VenuePhone";
+import { venuePriceLabel, publicPriceReference } from "../utils/venuePrice";
+import SportIcon, { getSportBadgeStyle } from "./SportIcons";
 
 function isPriceSummary(value) {
   const text = String(value || "").trim();
@@ -40,7 +42,7 @@ const VenueCard = React.memo(function VenueCard({
   } = venue;
 
   const name = lang === "en" ? name_en || nameVi : nameVi;
-  const displayPrice = isPriceSummary(price_summary)
+  const displayPrice = publicPriceReference(venue.price_reference) ? venuePriceLabel(venue,lang) : isPriceSummary(price_summary)
     ? price_summary
     : lang === "vi"
       ? "Chưa có giá công khai"
@@ -100,12 +102,14 @@ const VenueCard = React.memo(function VenueCard({
           }}
         />
 
-        {(!image || imageFailed) && (
+        {(!image || imageFailed || ['illustrative','candidate'].includes(venue.image_kind || venue.imageKind)) && (
           <span
             className="badge"
             style={{ position: "absolute", bottom: 8, left: 8 }}
           >
-            {lang === "vi" ? "Ảnh minh họa" : "Illustrative image"}
+            {image && !imageFailed && (venue.image_kind || venue.imageKind) === 'candidate'
+              ? (lang === 'vi' ? 'Ảnh nguồn chưa xác minh' : 'Unverified source image')
+              : (lang === "vi" ? "Ảnh minh họa" : "Illustrative image")}
           </span>
         )}
         {/* Top Badges */}
@@ -119,10 +123,11 @@ const VenueCard = React.memo(function VenueCard({
           }}
         >
           <span
-            className="badge badge-sport"
-            style={{ fontSize: "0.72rem", padding: "3px 8px" }}
+            className={`badge flex items-center gap-1.5 shadow-sm font-bold ${getSportBadgeStyle(sport)}`}
+            style={{ fontSize: "0.72rem", padding: "3px 9px", backdropFilter: "blur(6px)" }}
           >
-            {sport}
+            <SportIcon sport={sport} size={13} stroke={2} />
+            <span>{sport}</span>
           </span>
           <span
             className="badge badge-highlight"

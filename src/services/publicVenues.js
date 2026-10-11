@@ -1,13 +1,9 @@
 import { supabase } from "../supabase";
 import { getDistance } from "../utils/geo";
-import bundledVenues from "../data/venues.json";
+import { publicPriceReference } from "../utils/venuePrice";
 
 const PAGE_SIZE = 24;
 const BATCH_SIZE = 60;
-const bundledCourtCount = bundledVenues.reduce(
-  (total, venue) => total + (Number(venue.scale_courts) || 0),
-  0,
-);
 const normalize = (value) =>
   String(value || "")
     .normalize("NFD")
@@ -44,28 +40,25 @@ const publicFields = [
   "lat",
   "lng",
 ];
-const queryFields = ["id", ...publicFields].join(",");
+// Project only public rating fields from imported JSON; do not expose raw_data.
+const ratingFields = ["rating", "reviews_count", "google_rating", "google_reviews_count", "google_place_id"];
+const queryFields = ["id", ...publicFields, ...ratingFields.map((key) => `imported_${key}:raw_data->${key}`), "imported_imageKind:raw_data->imageKind", "imported_price_reference:raw_data->price_reference"].join(",");
 
 function publicVenue(data) {
+  const ratings = Object.fromEntries(ratingFields.map((key) => [key, data[key] ?? data[`imported_${key}`]]));
   return {
     ...Object.fromEntries(
       publicFields
         .filter((key) => data[key] !== undefined)
         .map((key) => [key, data[key]]),
     ),
+    ...Object.fromEntries(Object.entries(ratings).filter(([, value]) => value !== undefined)),
+    ...(['illustrative','candidate'].includes(data.imported_imageKind) ? { image_kind: data.imported_imageKind } : {}),
+    ...(publicPriceReference(data.imported_price_reference) ? {price_reference:publicPriceReference(data.imported_price_reference)} : {}),
     id: data.id,
   };
 }
 
-const bundledPublicVenues = bundledVenues.map(publicVenue);
-const bundledSearchText = new Map(
-  bundledPublicVenues.map((venue) => [
-    venue.id,
-    normalize(
-      `${venue.name || ""} ${venue.address || ""} ${venue.province || ""} ${venue.name_en || ""}`,
-    ),
-  ]),
-);
 
 function matchesVenue(venue, data, search) {
   if (venue.status === "archived") return false;
@@ -83,10 +76,9 @@ function matchesVenue(venue, data, search) {
     return false;
   if (
     search &&
-    !(bundledSearchText.get(venue.id) ||
-      normalize(
+    !normalize(
         `${venue.name || ""} ${venue.address || ""} ${venue.province || ""} ${venue.name_en || ""}`,
-      )).includes(search)
+      ).includes(search)
   )
     return false;
   return true;
@@ -101,22 +93,6 @@ function applyDistance(venue, data) {
   return venue;
 }
 
-function listBundledVenues(data, search) {
-  const filtered = bundledPublicVenues
-    .filter((venue) => matchesVenue(venue, data, search))
-    .map((venue) => applyDistance(venue, data))
-    .filter(Boolean);
-  const nextIndex = data.cursor
-    ? filtered.findIndex((venue) => venue.id > data.cursor)
-    : 0;
-  const start = nextIndex === -1 ? filtered.length : nextIndex;
-  const items = filtered.slice(start, start + PAGE_SIZE);
-  return {
-    items,
-    cursor: items.at(-1)?.id || data.cursor || null,
-    hasMore: start + items.length < filtered.length,
-  };
-}
 
 export async function listPublicVenues(data = {}) {
   const items = [];
@@ -150,26 +126,15 @@ export async function listPublicVenues(data = {}) {
 
     let { data: snapshot, error } = await buildQuery(Boolean(remoteSearch));
     if (error) {
-      if (["PGRST205", "42P01", "42703"].includes(error.code)) {
-        snapshot = [];
-      } else {
-        throw error;
-      }
+      throw error;
     }
     // Postgres ilike is accent-sensitive. Retry one unfiltered batch when a
     // normalized client search has no server-side match, preserving accent-insensitive search.
     if (remoteSearch && !items.length && !snapshot.length && !data.cursor) {
       ({ data: snapshot, error } = await buildQuery(false));
       if (error) {
-        if (["PGRST205", "42P01", "42703"].includes(error.code)) {
-          snapshot = [];
-        } else {
-          throw error;
-        }
+        throw error;
       }
-    }
-    if (!snapshot.length && !items.length && !data.cursor) {
-      return listBundledVenues(data, search);
     }
     
     hasMore = snapshot.length === BATCH_SIZE;
@@ -206,12 +171,12 @@ export async function publicCatalogue() {
     supabase.from("Facilities").select("*", { count: "exact", head: true }),
     supabase.from("Courts").select("*", { count: "exact", head: true }),
   ]);
-  if (facilities.error && !["PGRST205", "42P01", "42703"].includes(facilities.error.code)) throw facilities.error;
-  if (courts.error && !["PGRST205", "42P01", "42703"].includes(courts.error.code)) throw courts.error;
+  if (facilities.error) throw facilities.error;
+  if (courts.error) throw courts.error;
 
   return {
     provinces,
-    totalVenues: facilities.count || bundledVenues.length,
-    totalCourts: courts.count || bundledCourtCount,
+    totalVenues: facilities.count ?? 0,
+    totalCourts: courts.count ?? 0,
   };
 }

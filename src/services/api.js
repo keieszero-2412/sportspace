@@ -1,6 +1,12 @@
 import { supabase } from "../supabase";
 import { listPublicVenues, publicCatalogue } from "./publicVenues";
 const errors = {
+  "venue-data-changed": "Dữ liệu sân vừa thay đổi. Tải lại và duyệt lại. / Venue data changed; reload before reviewing.",
+  "image-rights-required": "Cần xác nhận quyền sử dụng ảnh và ghi nguồn cấp quyền. / Confirm image usage rights and document the license.",
+  "invalid-venue-phone": "Số điện thoại không hợp lệ hoặc đang thuộc nhóm cần đối soát. / Invalid or quarantined phone number.",
+  "venue-identity-confirmation-required": "Cần đối chiếu tên và địa chỉ sân trước khi duyệt. / Confirm the venue name and address first.",
+  "single-slot-gap": "Không được bỏ trống đúng 1 ô giữa hai ô đã chọn trên cùng sân. / Do not leave exactly one empty slot between selections on the same court.",
+  "too-many-booking-slots": "Mỗi đơn được chọn tối đa 16 ô. / Select up to 16 slots per order.",
   "payment-verification-required":
     "Cần biên lai còn hạn, số tiền đúng và mã giao dịch đã kiểm tra. / Verify an unexpired receipt, the exact amount and the bank transaction reference.",
   "refund-verification-required":
@@ -29,6 +35,8 @@ const errors = {
   "hold-expired": "Đã hết hạn giữ sân. / The hold expired.",
   "court-not-bookable":
     "Sân chưa đủ dữ liệu hoặc đang ngừng hoạt động. / Court data is incomplete or inactive.",
+  "facility-owner-not-configured":
+    "Cơ sở chưa được gán chủ sân đã duyệt để nhận và xác minh chuyển khoản. Vui lòng liên hệ quản trị viên. / This facility has no approved owner to receive and verify transfers. Please contact an administrator.",
   "owner-required":
     "Bạn không có quyền quản lý cơ sở này. / You do not own this facility.",
   "active-transactions-prevent-deletion":
@@ -40,7 +48,7 @@ const errors = {
 };
 const publicCache = new Map();
 const inFlight = new Map();
-const cacheStorageKey = `sportspace:public-catalogue:v5:supabase-bundled-fallback`;
+const cacheStorageKey = `sportspace:public-catalogue:v6:imported-ratings`;
 try {
   const entries = JSON.parse(localStorage.getItem(cacheStorageKey) || "[]");
   if (Array.isArray(entries))
@@ -77,9 +85,14 @@ export async function api(action, data = {}) {
         ? publicCatalogue()
         : listPublicVenues(data)
       : (async () => {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.access_token) {
+            throw new Error("Phiên đăng nhập đã hết hạn. Vui lòng tải lại trang hoặc đăng nhập lại. (Auth session missing)");
+          }
+          const headers = { Authorization: `Bearer ${session.access_token}` };
           const { data: res, error } = await supabase.functions.invoke("sportspace", {
             body: { action, data },
-            timeout: 15000,
+            headers,
           });
           if (error) {
             // Try to extract real error body from FunctionsHttpError
@@ -118,7 +131,7 @@ export async function api(action, data = {}) {
         until: Date.now() + (action === "catalogue" ? 15 : 5) * 60000,
       });
       persistPublicCache();
-    } else if (["saveCourt", "archiveCourt", "saveFacility"].includes(action)) {
+    } else if (["saveCourt", "archiveCourt", "saveFacility", "reviewVenueData"].includes(action)) {
       publicCache.clear();
       persistPublicCache();
     }
@@ -138,7 +151,7 @@ export async function api(action, data = {}) {
 }
 export function watch(col, filters, callback, error, options = {}) {
   const fetchQuery = () => {
-    let q = supabase.from(col).select('*');
+    let q = supabase.from(col).select(options.select || '*');
     filters.forEach(([field, op, value]) => {
       if (op === '==') q = q.eq(field, value);
       else if (op === '>') q = q.gt(field, value);
@@ -154,26 +167,54 @@ export function watch(col, filters, callback, error, options = {}) {
 
   let channel;
   let stopped = false;
-  fetchQuery().then(({ data, error: err }) => {
-    if (stopped) return;
-    if (err) {
-      console.error(`watch error on ${col}:`, err);
-      if (!(options.optional && err.code === "PGRST205") && error) error(err);
-      return;
+  let requestController;
+  let requestTimer;
+  const report = (err) => {
+    if (stopped || (options.optional && err?.code === "PGRST205")) return;
+    console.error(`watch error on ${col}:`, err);
+    error?.(err instanceof Error ? err : Object.assign(new Error(err?.message || `Unable to load ${col}`), { code: err?.code }));
+  };
+  const refresh = async () => {
+    if (stopped) return false;
+    requestController?.abort();
+    clearTimeout(requestTimer);
+    const controller = new AbortController();
+    requestController = controller;
+    const timeoutMs = options.timeoutMs ?? 10000;
+    requestTimer = setTimeout(() => controller.abort("request-timeout"), timeoutMs);
+    try {
+      const { data, error: err } = await fetchQuery().abortSignal(controller.signal);
+      if (stopped || requestController !== controller) return false;
+      if (err) throw err;
+      callback(data || []);
+      return true;
+    } catch (err) {
+      if (stopped || requestController !== controller) return false;
+      report(controller.signal.aborted
+        ? new Error(`Không tải được dữ liệu sau ${Math.ceil(timeoutMs / 1000)} giây. Vui lòng thử lại. / Data request timed out; please retry.`)
+        : err);
+      return false;
+    } finally {
+      if (requestController === controller) {
+        clearTimeout(requestTimer);
+        requestController = undefined;
+      }
     }
-    callback(data || []);
+  };
+  void refresh().then((loaded) => {
+    if (!loaded || stopped) return;
     channel = supabase
       .channel(`${col}:${JSON.stringify(filters)}:${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: col }, () => {
-        fetchQuery().then(({ data: nextData, error: nextError }) => {
-          if (!nextError) callback(nextData || []);
-        });
+        void refresh();
       })
       .subscribe();
   });
 
   return () => {
     stopped = true;
+    clearTimeout(requestTimer);
+    requestController?.abort("watch-stopped");
     if (channel) supabase.removeChannel(channel);
   };
 }
@@ -209,7 +250,8 @@ export async function uploadImage(file, path) {
     throw new Error("Chỉ nhận ảnh JPG, PNG, WebP tối đa 5 MB. / Images up to 5 MB only.");
     
   const fileName = `${path}/${crypto.randomUUID()}`;
-  const { data, error } = await supabase.storage.from('sportspace').upload(fileName, file, { contentType: file.type });
+  const bucket = path.startsWith("receipts/") ? "sportspace-receipts" : "sportspace";
+  const { data, error } = await supabase.storage.from(bucket).upload(fileName, file, { contentType: file.type });
   if (error) throw error;
   
   const { data: urlData } = supabase.storage.from('sportspace').getPublicUrl(fileName);
@@ -219,8 +261,8 @@ export async function uploadImage(file, path) {
   };
 }
 
-export async function openPrivateImage(path) {
-  const { data, error } = await supabase.storage.from('sportspace').download(path);
+export async function openPrivateImage(path, bucket = "sportspace") {
+  const { data, error } = await supabase.storage.from(bucket).download(path);
   if (error) throw error;
   const url = URL.createObjectURL(data);
   const link = document.createElement("a");

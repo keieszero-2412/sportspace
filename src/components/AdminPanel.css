@@ -1,0 +1,87 @@
+.admin-panel { padding: 32px 20px 64px; color: var(--text-primary); }
+.admin-panel h2 { margin: 6px 0 10px; font-size: clamp(1.6rem, 3vw, 2.2rem); }
+.admin-panel h3 { font-size: 1.15rem; margin-bottom: 10px; }
+.admin-panel p { line-height: 1.65; }
+.admin-page-header, .admin-section-heading, .admin-dialog-header { display: flex; justify-content: space-between; align-items: center; gap: 20px; }
+.admin-page-header { margin-bottom: 24px; }
+.admin-page-header p, .admin-muted, .admin-review > p, .admin-review small { color: var(--text-muted); }
+.admin-eyebrow { color: var(--brand-sport); font-size: .7rem; letter-spacing: .14em; font-weight: 700; }
+.admin-status-pill { padding: 7px 12px; border-radius: 999px; background: var(--bg-secondary); border: 1px solid var(--surface-card-border); font-size: .8rem; white-space: nowrap; }
+.admin-section-nav { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; margin-bottom: 24px; background: var(--bg-secondary); border: 1px solid var(--surface-card-border); border-radius: 14px; }
+.admin-section-nav a { padding: 10px 14px; border-radius: 9px; font-size: .9rem; font-weight: 600; color: var(--text-primary); }
+.admin-section-nav a:hover { background: var(--surface-card); }
+.admin-section-nav span, .admin-subheading span { padding: 2px 8px; border-radius: 999px; background: var(--surface-card); font-size: .75rem; }
+.admin-panel :is(a, button, summary, input, select, textarea):focus-visible { outline: 3px solid var(--brand-sport); outline-offset: 3px; }
+.admin-panel :is(#venue-data-review, #admin-image-archive, #admin-merchants, #admin-bank) { scroll-margin-top: 100px; }
+.admin-panel .admin-review { padding: clamp(16px, 3vw, 28px); border: 1px solid var(--surface-card-border); box-shadow: var(--shadow-sm); }
+.admin-stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.admin-stat-grid > div { border: 1px solid var(--surface-card-border); border-radius: 12px; background: var(--bg-secondary); padding: 16px; }
+.admin-stat-grid span { display: block; font-size: .8rem; color: var(--text-muted); }
+.admin-stat-grid strong { display: block; font-size: 1.8rem; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.admin-table-scroll { overflow-x: auto; border: 1px solid var(--surface-card-border); border-radius: 12px; margin: 14px 0; }
+.admin-coverage-table { width: 100%; text-align: left; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.admin-coverage-table th { background: var(--bg-secondary); color: var(--text-muted); font-size: .75rem; font-weight: 600; white-space: nowrap; }
+.admin-coverage-table :is(th, td) { padding: 12px 14px; border-bottom: 1px solid var(--surface-card-border); }
+.admin-coverage-table tr:last-child td { border-bottom: 0; }
+.admin-details { border: 1px solid var(--surface-card-border); border-radius: 12px; padding: 16px; background: var(--bg-secondary); margin: 20px 0; }
+.admin-details > summary { cursor: pointer; font-weight: 600; }
+.admin-details > summary span { font-size: .8rem; font-weight: 400; color: var(--text-muted); margin-left: 10px; }
+.admin-details[open] > summary { margin-bottom: 18px; }
+.admin-missing-sources label { display: grid; gap: 6px; margin: 16px 0; max-width: 440px; }
+.admin-missing-row { border-top: 1px solid var(--surface-card-border); padding: 12px 0; font-size: .85rem; }
+.admin-venue-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); max-height: 280px; overflow-y: auto; gap: 8px; margin: 14px 0; padding: 4px; }
+.admin-panel .admin-venue-option { justify-content: flex-start; text-align: left; border-radius: 10px; min-height: 48px; font-size: .8rem; line-height: 1.5; white-space: normal; }
+.admin-selected-venue { margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--surface-card-border); }
+.admin-selected-venue > h4 { font-size: 1.15rem; font-weight: 700; }
+.admin-selected-venue > p { color: var(--text-muted); font-size: .9rem; margin: 6px 0 14px; }
+.admin-image-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0; }
+.admin-current-value, .admin-selected-image { padding: 16px; border: 1px solid var(--surface-card-border); border-radius: 12px; background: var(--bg-secondary); min-width: 0; }
+.admin-current-value span { display: block; overflow-wrap: anywhere; font-size: .8rem; color: var(--text-muted); }
+.admin-selected-image { border-color: var(--brand-space); }
+.admin-selected-image h4 { font-weight: 600; margin-bottom: 12px; }
+.admin-selected-image p { font-size: .8rem; color: var(--text-muted); }
+.admin-image-comparison .admin-current-value img { width: 100% !important; height: 220px !important; object-fit: contain !important; border-radius: 8px; }
+.admin-subheading { margin: 24px 0 12px; font-weight: 700; }
+.admin-candidate-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; max-height: 580px; overflow-y: auto; overscroll-behavior: contain; padding: 4px; align-content: start; }
+.admin-candidate-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 24px; }
+.admin-source-card { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 12px; border: 2px solid var(--surface-card-border); border-radius: 12px; background: var(--bg-secondary); transition: border-color .15s; }
+.admin-source-card.is-selected { border-color: var(--brand-space); box-shadow: var(--shadow-sm); }
+.admin-candidate-image { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; background: var(--surface-card); }
+.admin-source-card > a { font-size: .8rem; color: var(--brand-sport); text-decoration: underline; }
+.admin-source-card > button { margin-top: auto; width: 100%; }
+.admin-candidate-value { font-size: 1.1rem; overflow-wrap: anywhere; }
+.admin-source-details { color: var(--text-muted); font-size: .78rem; overflow-wrap: anywhere; }
+.admin-source-details summary { cursor: pointer; padding: 4px 0; }
+.admin-source-details p { margin-top: 6px; }
+.admin-review-form { display: grid; gap: 14px; border: 1px solid var(--surface-card-border); border-radius: 14px; padding: 20px; background: var(--bg-secondary); }
+.admin-review-form h4 { font-weight: 700; }
+.admin-panel :is(.admin-review-form, .admin-form-grid) label { display: grid; gap: 7px; font-size: .85rem; line-height: 1.6; }
+.admin-review-form label:has(input[type='checkbox']) { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; }
+.admin-review-form input[type='checkbox'] { flex-shrink: 0; margin-top: 5px; width: 17px; height: 17px; accent-color: var(--brand-space); }
+.admin-review-form textarea { min-height: 96px; resize: vertical; }
+.admin-review-actions { display: flex; flex-wrap: wrap; gap: 10px; padding-top: 14px; border-top: 1px solid var(--surface-card-border); }
+.admin-review-actions button:first-child { min-width: 180px; }
+.admin-empty-state { padding: 24px; margin: 20px 0; border: 1px dashed var(--surface-card-border); border-radius: 12px; text-align: center; color: var(--text-muted); }
+.admin-work-section { padding: 24px; margin: 24px 0; border: 1px solid var(--surface-card-border); border-radius: 16px; background: var(--bg-secondary); }
+.admin-merchant-grid, .admin-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 20px 0; }
+.admin-merchant-grid .feature-card { min-width: 0; }
+.admin-merchant-grid select { margin: 12px 0; }
+.admin-image-overlay { position: fixed; inset: 0; z-index: 2000; background: rgb(0 0 0 / .65); display: grid; place-items: center; padding: 16px; }
+.admin-image-dialog { width: 100%; max-width: 1080px; max-height: 90dvh; overflow-y: auto; overscroll-behavior: contain; background: var(--bg-primary); border: 1px solid var(--surface-card-border); border-radius: 18px; padding: 20px; box-shadow: var(--shadow-lg); }
+.admin-dialog-header { position: sticky; top: -20px; z-index: 1; background: var(--bg-primary); padding: 16px 0; margin-bottom: 12px; border-bottom: 1px solid var(--surface-card-border); }
+@media (max-width: 760px) {
+  .admin-page-header { align-items: flex-start; flex-direction: column; gap: 12px; }
+  .admin-section-nav a { padding: 8px 10px; font-size: .8rem; }
+  .admin-venue-grid, .admin-candidate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .admin-image-comparison, .admin-candidate-list, .admin-merchant-grid, .admin-form-grid { grid-template-columns: 1fr; }
+  .admin-stat-grid { gap: 6px; }
+  .admin-stat-grid > div { padding: 10px; }
+  .admin-stat-grid strong { font-size: 1.4rem; }
+  .admin-work-section, .admin-review-form { padding: 16px; }
+  .admin-image-dialog { padding: 12px; max-height: 94dvh; }
+  .admin-dialog-header { top: -12px; }
+}
+@media (max-width: 420px) {
+  .admin-candidate-grid, .admin-venue-grid { grid-template-columns: 1fr; }
+  .admin-review-actions button { width: 100%; }
+}

@@ -1,4 +1,7 @@
 import { saveProfile } from "./profile.js";
+import { reviewVenueData } from "./venueData.js";
+import { bookingSetup, mutateBooking, availabilityRange } from "./booking.js";
+import { normalizeSelections, selectionRanges } from "./selection.js";
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
@@ -95,20 +98,28 @@ serve(async (req) => {
       const bookingSql = await getSql();
       if (!bookingSql) throw new Error("database-not-configured");
       const facilityId = id(data.facilityId);
-      const courtId = id(data.courtId);
+      const selections = normalizeSelections(data);
+      const courtIds = selections.map((selection) => id(selection.courtId));
+      const courtId = courtIds[0];
       const key = id(data.key);
       const bookingId = await hash(`${uid}:${key}`);
       const fingerprint = await hash(
         JSON.stringify([
           facilityId,
-          courtId,
+          data.selections === undefined ? courtId : selections,
           data.date,
-          data.times,
+          data.selections === undefined ? data.times : null,
           data.duration,
         ]),
       );
 
       const result = await bookingSql.begin(async (tx: any) => {
+        // A court row is the mutex for holds and payment transitions. Lock it
+        // before checking idempotency so retries and overlapping holds serialize.
+        // Stable order prevents deadlocks between bookings sharing courts.
+        for (const selectedCourtId of courtIds) {
+          await tx`SELECT id FROM "Courts" WHERE id = ${selectedCourtId} FOR UPDATE`;
+        }
         // Check if booking already exists
         const [old] =
           await tx`SELECT * FROM "Bookings" WHERE id = ${bookingId}`;
@@ -119,44 +130,46 @@ serve(async (req) => {
           return old;
         }
 
-        const [fs] =
+        const [facilityRow] =
           await tx`SELECT * FROM "Facilities" WHERE id = ${facilityId}`;
-        const [cs] = await tx`SELECT * FROM "Courts" WHERE id = ${courtId}`;
-        const [ps] =
+        const [paymentRow] =
           await tx`SELECT * FROM "PaymentConfig" WHERE id = ${facilityId}`;
+        const [player] = await tx`SELECT * FROM "Users" WHERE id = ${uid}`;
+        if (player?.raw_data?.deletionRequested) throw new Error("account-deleting");
 
-        if (
-          !fs?.ownerId ||
-          fs.status === "archived" ||
-          !cs ||
-          cs.status !== "active"
-        ) {
-          throw new Error("court-not-bookable");
-        }
-        if (!ps?.verifiedAt) throw new Error("payment-not-configured");
-
-        if (
-          !Array.isArray(data.times) ||
-          !data.times.length ||
-          data.times.length > 16
-        ) {
-          throw new Error("select-time");
-        }
-
-        const ranges = [...new Set(data.times)]
-          .map((t: string) =>
-            interval(data.date, t, data.duration, fs.operating_hours),
-          )
-          .sort((a, b) => a.startAt - b.startAt);
-
-        if (
-          ranges.some((r) => r.startAt <= now) ||
-          ranges.some((r, i) => i > 0 && overlaps(r, ranges[i - 1]))
-        ) {
+        const bookingItems: any[] = [];
+        let fs: any;
+        let payment: any;
+        for (const selection of selections) {
+        const courtId = selection.courtId;
+        const [courtRow] = await tx`SELECT * FROM "Courts" WHERE id = ${courtId}`;
+        const setup = bookingSetup(facilityRow, courtRow, paymentRow);
+        fs = setup.facility;
+        payment = setup.payment;
+        const cs = setup.court;
+        const ranges = selectionRanges(selection, data.date, data.duration, fs.operating_hours, interval);
+        if (ranges.some((r) => r.startAt <= now)) {
           throw new Error("invalid-interval");
         }
 
         const keys = lockIds(courtId, ranges);
+
+        // Imported schedules may predate SlotLocks. They must still block a
+        // reservation; availability filtering in the browser is not sufficient.
+        const previousDate = new Date(Date.parse(`${data.date}T00:00:00Z`) - 86400000).toISOString().slice(0, 10);
+        const nextDate = new Date(Date.parse(`${data.date}T00:00:00Z`) + 86400000).toISOString().slice(0, 10);
+        const schedules = await tx`SELECT * FROM "Availability"
+          WHERE ("court_id" = ${courtId} OR "courtId" = ${courtId})
+          AND date IN (${data.date}, ${previousDate}, ${nextDate})`;
+        for (const schedule of schedules) {
+          const occupied = availabilityRange(schedule, now);
+          if (occupied && ranges.some((range) => overlaps(range, occupied))) throw new Error("slot-taken");
+        }
+        const legacyBookings = await tx`SELECT id FROM "Bookings"
+          WHERE ("courtId" = ${courtId} OR raw_data->>'court_id' = ${courtId})
+          AND "schemaVersion" IS DISTINCT FROM 2
+          AND lower(coalesce(status, raw_data->>'status', '')) IN ('pending', 'approved', 'confirmed', 'held', 'pending_approval') LIMIT 1`;
+        if (legacyBookings.length) throw new Error("legacy-schedule-needs-review");
 
         // Check existing locks
         if (keys.length > 0) {
@@ -167,7 +180,15 @@ serve(async (req) => {
           }
         }
 
-        const totalAmount = quote(cs, fs, ranges);
+        bookingItems.push({ courtId, courtName: cs.name, times: ranges.map((range) => range.time),
+          ranges, lockIds: keys, totalAmount: quote(cs, fs, ranges),
+          pricingSnapshot: { basePrice: cs.basePrice, price_day: cs.price_day, price_night: cs.price_night,
+            price_weekend: cs.price_weekend, pricing: fs.pricing || {}, version: fs.pricingVersion || cs.updatedAt || null } });
+        }
+        const ranges = bookingItems.flatMap((item) => item.ranges.map((range: any) => ({ ...range, courtId: item.courtId })))
+          .sort((a, b) => a.startAt - b.startAt);
+        const keys = bookingItems.flatMap((item) => item.lockIds);
+        const totalAmount = bookingItems.reduce((sum, item) => sum + item.totalAmount, 0);
         const expires = Math.min(now + HOLD_MS, ranges[0].startAt);
 
         const b = {
@@ -178,10 +199,11 @@ serve(async (req) => {
           venueId: facilityId,
           facilityId,
           courtId,
-          courtName: cs.name,
+          courtName: bookingItems.map((item) => item.courtName).join(", "),
           venueName: fs.name,
           date: data.date,
-          time: data.times.join(", "),
+          time: bookingItems.length === 1 ? bookingItems[0].times.join(", ")
+            : bookingItems.map((item) => `${item.courtName}: ${item.times.join(", ")}`).join("; "),
           duration: data.duration,
           ranges: JSON.stringify(ranges),
           startAt: ranges[0].startAt,
@@ -201,12 +223,10 @@ serve(async (req) => {
           note: text(data.note),
           paymentMethod: "bank_transfer",
           paymentGateway: "Bank transfer",
+          payment: JSON.stringify(payment),
           createdAt: new Date(now).toISOString(),
-          pricingSnapshot: JSON.stringify({
-            basePrice: cs.basePrice,
-            pricing: fs.pricing || {},
-            version: fs.pricingVersion || cs.updatedAt || null,
-          }),
+          pricingSnapshot: JSON.stringify(bookingItems.length === 1 ? bookingItems[0].pricingSnapshot : { items: bookingItems.map((item) => item.pricingSnapshot) }),
+          raw_data: JSON.stringify({ bookingItems }),
         };
 
         if (!b.customerName || !/^[+\d\s-]{8,20}$/.test(b.phone)) {
@@ -214,7 +234,9 @@ serve(async (req) => {
         }
 
         // Insert locks and availability
-        for (const k of keys) {
+        for (const item of bookingItems) {
+        const courtId = item.courtId;
+        for (const k of item.lockIds) {
           const startAt = Number(k.slice(k.lastIndexOf("_") + 1));
           await tx`
             INSERT INTO "SlotLocks" (id, "bookingId", "courtId", "expiresAt")
@@ -237,9 +259,10 @@ serve(async (req) => {
               status = EXCLUDED.status
           `;
         }
+        }
 
         await tx`INSERT INTO "Bookings" ${tx(b)}`;
-        return b;
+        return { ...b, payment, ranges, lockIds: keys, raw_data: { bookingItems } };
       });
 
       return new Response(JSON.stringify({ data: result }), {
@@ -247,6 +270,22 @@ serve(async (req) => {
           "Content-Type": "application/json",
           "Access-Control-Allow-Origin": "*",
         },
+      });
+    }
+
+    if (action === "submitReceipt" || action === "bookingTransition") {
+      const bookingSql = await getSql();
+      if (!bookingSql) throw new Error("database-not-configured");
+      const result = await mutateBooking(bookingSql, uid, { ...data, bookingId: id(data.bookingId) }, action, now,
+        async (path: string) => {
+          const storageClient = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "");
+          const { data: blob, error } = await storageClient.storage.from("sportspace-receipts").download(path);
+          if (error) throw error;
+          if (!blob || !["image/jpeg", "image/png", "image/webp"].includes(blob.type) || blob.size > 5 * 1024 * 1024)
+            throw new Error("invalid-receipt-file");
+        });
+      return new Response(JSON.stringify({ data: result }), {
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       });
     }
 
@@ -280,6 +319,13 @@ serve(async (req) => {
     if (profileError) throw profileError;
     const role = profile?.role || profile?.raw_data?.role;
 
+    if (action === "reviewVenueData") {
+      const saved = await reviewVenueData(serviceClient, data, { uid, role }, now);
+      return new Response(JSON.stringify({ data: saved }), {
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+      });
+    }
+
     if (action === "createMatch") {
       const rawCredibility = Number(profile?.credibilityScore ?? profile?.raw_data?.credibilityScore ?? 0);
       const credibility = rawCredibility > 100 ? rawCredibility / 100 : rawCredibility;
@@ -307,6 +353,13 @@ serve(async (req) => {
       const { data: saved, error } = await serviceClient.from("Matches")
         .upsert({ ...match, raw_data: match }, { onConflict: "id", ignoreDuplicates: true }).select("*").single();
       if (error) throw error;
+
+      const _currentJoined = Array.isArray(profile?.raw_data?.joinedMatchIds) ? profile.raw_data.joinedMatchIds : [];
+      const joinedMatchIds = [...new Set([..._currentJoined, matchId])];
+      const rawData = { ...(profile?.raw_data || {}), joinedMatchIds };
+      const { error: userError } = await serviceClient.from("Users").update({ raw_data: rawData }).eq("id", uid);
+      if (userError) throw userError;
+
       return new Response(JSON.stringify({ data: saved }), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
     }
 
@@ -318,6 +371,19 @@ serve(async (req) => {
         p_operation: text(data.operation, 20), p_now: now,
       });
       if (error) throw error;
+
+      if (data.operation === "join" || data.operation === "leave") {
+        let joinedMatchIds = Array.isArray(profile?.raw_data?.joinedMatchIds) ? profile.raw_data.joinedMatchIds : [];
+        if (data.operation === "join") {
+          joinedMatchIds = [...new Set([...joinedMatchIds, id(data.matchId)])];
+        } else if (data.operation === "leave") {
+          joinedMatchIds = joinedMatchIds.filter((mId: string) => mId !== id(data.matchId));
+        }
+        const rawData = { ...(profile?.raw_data || {}), joinedMatchIds };
+        const { error: userError } = await serviceClient.from("Users").update({ raw_data: rawData }).eq("id", uid);
+        if (userError) throw userError;
+      }
+
       return new Response(JSON.stringify({ data: patch }), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
     }
 
@@ -517,7 +583,7 @@ serve(async (req) => {
   } catch (err) {
     return new Response(
       JSON.stringify({
-        error: err instanceof Error ? err.message : String(err),
+        error: err instanceof Error ? err.message : (err?.message || String(err)),
         stack: err instanceof Error ? err.stack : undefined,
         code: err?.code,
         detail: err?.detail,

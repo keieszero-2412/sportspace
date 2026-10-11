@@ -12,6 +12,9 @@ import {
 } from "../../functions/domain";
 import { useToast } from "./ToastContext";
 import AsyncStatus from "./AsyncStatus";
+import GoogleRating from "./GoogleRating";
+import { activeCourt, bookingRecord } from "../../supabase/functions/sportspace/booking.js";
+import { normalizeSelections, selectionRanges } from "../../supabase/functions/sportspace/selection.js";
 
 export default function BookingModal({
   venue,
@@ -30,8 +33,7 @@ export default function BookingModal({
     [retry, setRetry] = useState(0);
   const [date, setDate] = useState(localDate()),
     [duration, setDuration] = useState(60);
-  const [courtId, setCourtId] = useState(preselectedCourtId || ""),
-    [times, setTimes] = useState([]);
+  const [selectedTimes, setSelectedTimes] = useState({});
   const [name, setName] = useState(userProfile?.name || ""),
     [phone, setPhone] = useState(userProfile?.phone || ""),
     [note, setNote] = useState("");
@@ -56,7 +58,7 @@ export default function BookingModal({
     setLoading(true);
     setError(null);
     setAvailability([]);
-    setTimes([]);
+    setSelectedTimes({});
     let a = false,
       b = false;
     const loaded = () => {
@@ -72,9 +74,8 @@ export default function BookingModal({
       [["facility_id", "==", venue.facility_id || venue.id]],
       (v) => {
         const activeCourts = v
-          .map((court) => ({ ...(court.raw_data || {}), ...court }))
-          .filter((c) => c.status === "active" || c.status === "Đang hoạt động" || c.is_available === true)
-          .map((c) => ({ ...c, basePrice: c.basePrice || c.price_day || c.price_night || 100000 }));
+          .map(bookingRecord)
+          .filter(activeCourt);
         setCourts(activeCourts);
         a = true;
         s2();
@@ -107,10 +108,15 @@ export default function BookingModal({
             loaded();
           },
           fail,
-          { limit: 500 },
+          {
+            limit: 500,
+            timeoutMs: 8000,
+            select: "id,court_id,courtId,date,start_time,end_time,startAt,endAt,expiresAt,status,raw_data",
+          },
         );
       },
       fail,
+      { limit: 500, timeoutMs: 8000 },
     );
     return () => {
       s1();
@@ -126,14 +132,24 @@ export default function BookingModal({
   useEffect(() => {
     if (!trackedId) return;
     let channel;
+    let active = true;
     const fetchBooking = async () => {
-      const { data } = await supabase.from("Bookings").select("*").eq("id", trackedId).single();
-      if (data && data.userId === userProfile?.uid) {
-        setBooking(data);
-        setStep("payment");
-      } else {
-        sessionStorage.removeItem(storageKey);
-        setTrackedId(null);
+      try {
+        const { data, error } = await supabase.from("Bookings").select("*").eq("id", trackedId).maybeSingle();
+        if (!active) return;
+        if (error) {
+          showError(error.message);
+          return;
+        }
+        if (data && data.userId === userProfile?.uid) {
+          setBooking(data);
+          setStep("payment");
+        } else {
+          sessionStorage.removeItem(storageKey);
+          setTrackedId(null);
+        }
+      } catch (error) {
+        if (active) showError(error.message);
       }
     };
     fetchBooking();
@@ -142,9 +158,11 @@ export default function BookingModal({
       .on('postgres_changes', { event: '*', schema: 'public', table: 'Bookings', filter: `id=eq.${trackedId}` }, fetchBooking)
       .subscribe();
       
-    return () => supabase.removeChannel(channel);
-  }, [trackedId, storageKey, userProfile?.uid]);
-  const chosen = courts.find((c) => c.id === courtId);
+    return () => {
+      active = false;
+      supabase.removeChannel(channel);
+    };
+  }, [trackedId, storageKey, userProfile?.uid, showError]);
   const slots = useMemo(() => {
     try {
       const { start, end } = opening(venue.operating_hours),
@@ -187,30 +205,31 @@ export default function BookingModal({
       return "booked";
     return "available";
   }
-  const total = useMemo(() => {
+  const selections = useMemo(() => Object.entries(selectedTimes)
+    .filter(([, times]) => times.length)
+    .map(([courtId, times]) => ({ courtId, times })), [selectedTimes]);
+  const selectionSummary = selections.map(({ courtId, times }) =>
+    `${courts.find((court) => court.id === courtId)?.name || courtId}: ${times.join(", ")}`).join(" · ");
+  const { total, selectionError } = useMemo(() => {
+    if (!selections.length) return { total: 0, selectionError: null };
     try {
-      return chosen && times.length
-        ? quote(
-            chosen,
-            venue,
-            times.map((t) =>
-              interval(date, t, duration, venue.operating_hours),
-            ),
-          )
-        : 0;
-    } catch {
-      return 0;
+      let total = 0;
+      for (const selection of normalizeSelections({ selections })) {
+        const court = courts.find((c) => c.id === selection.courtId);
+        if (!court) throw new Error("court-not-bookable");
+        const ranges = selectionRanges(selection, date, duration, venue.operating_hours, interval);
+        total += quote(court, venue, ranges);
+      }
+      return { total, selectionError: null };
+    } catch (error) {
+      return { total: 0, selectionError: error.message };
     }
-  }, [chosen, venue, date, times, duration]);
+  }, [selections, courts, venue, date, duration]);
   function toggle(c, time) {
-    if (cell(c, time) !== "available") return;
-    const selected = courtId === c.id ? times : [];
-    setCourtId(c.id);
-    setTimes(
-      selected.includes(time)
-        ? selected.filter((t) => t !== time)
-        : [...selected, time].sort(),
-    );
+    const selected = selectedTimes[c.id] || [];
+    if (!selected.includes(time) && cell(c, time) !== "available") return;
+    setSelectedTimes((previous) => ({ ...previous, [c.id]: selected.includes(time)
+      ? selected.filter((t) => t !== time) : [...selected, time].sort() }));
     key.current = crypto.randomUUID();
   }
   async function hold(e) {
@@ -223,12 +242,13 @@ export default function BookingModal({
     submitting.current = true;
     setBusy(true);
     try {
+      normalizeSelections({ selections });
+      if (selectionError) throw new Error(selectionError);
       const b = await api("holdBooking", {
         key: key.current,
-        facilityId: venue.id,
-        courtId,
+        facilityId: venue.facility_id || venue.id,
+        selections,
         date,
-        times,
         duration,
         customerName: name,
         phone,
@@ -253,7 +273,8 @@ export default function BookingModal({
         file,
         "receipts/" + userProfile.uid + "/" + booking.id,
       );
-      await api("submitReceipt", { bookingId: booking.id, path: image.path });
+      const updated = await api("submitReceipt", { bookingId: booking.id, path: image.path });
+      setBooking(updated);
       showInfo(
         tr(
           "Biên lai đã gửi, chờ chủ sân kiểm tra khoản chuyển.",
@@ -334,6 +355,9 @@ export default function BookingModal({
             <X size={18} />
           </button>
         </div>
+        <div style={{ marginBottom: 12 }}>
+          <GoogleRating venue={venue} lang={lang} />
+        </div>
         {step === "timetable" && (
           <>
             <div className="form-row">
@@ -352,7 +376,8 @@ export default function BookingModal({
                   value={duration}
                   onChange={(e) => {
                     setDuration(Number(e.target.value));
-                    setTimes([]);
+                    setSelectedTimes({});
+                    key.current = crypto.randomUUID();
                   }}
                 >
                   {[30, 60, 120].map((n) => (
@@ -425,11 +450,13 @@ export default function BookingModal({
                           </th>
                           {slots.map((t) => {
                             const state = cell(c, t),
-                              selected = courtId === c.id && times.includes(t);
+                              selected = (selectedTimes[c.id] || []).includes(t);
                             return (
                               <td key={t} style={{ padding: 4 }}>
                                 <button
-                                  disabled={state !== "available"}
+                                  disabled={!selected && state !== "available"}
+                                  aria-pressed={selected}
+                                  aria-label={`${c.name || c.id} ${t}`}
                                   onClick={() => toggle(c, t)}
                                   title={state}
                                   style={{ 
@@ -504,13 +531,20 @@ export default function BookingModal({
                 )}
               </>
             )}
+            <p>{tr("Có thể chọn nhiều sân. Trên mỗi sân, không để trống đúng 1 ô giữa các ô đã chọn (tối đa 16 ô/đơn).", "Select multiple courts. On each court, do not leave exactly one empty slot between selected slots (up to 16 slots/order).")}</p>
+            {selectionSummary && <p>{selectionSummary}</p>}
+            {selectionError && <p role="alert">{selectionError === "single-slot-gap"
+              ? tr("Không được bỏ trống đúng 1 ô giữa hai ô đã chọn trên cùng sân. Hãy chọn thêm ô trống hoặc đổi lựa chọn.", "Do not leave exactly one empty slot between selections on the same court. Fill the gap or change your selection.")
+              : selectionError === "too-many-booking-slots"
+                ? tr("Mỗi đơn được chọn tối đa 16 ô.", "Select up to 16 slots per order.")
+                : tr("Lựa chọn chưa có lịch hoặc giá hợp lệ. Vui lòng kiểm tra lại.", "Selected slots have invalid schedule or pricing. Please review.")}</p>}
             <p>
               {tr("Tổng thanh toán", "Total payment")}:{" "}
               <strong>{total.toLocaleString()} VND</strong>
             </p>
             <button
               className="btn btn-primary"
-              disabled={!total || loading || !!error}
+              disabled={!total || loading || !!error || !!selectionError}
               onClick={() =>
                 userProfile ? setStep("checkout") : onRequireAuth()
               }
@@ -551,7 +585,7 @@ export default function BookingModal({
               />
             </label>
             <p>
-              {chosen?.name} · {date} · {times.join(", ")} · {duration}{" "}
+              {selectionSummary} · {date} · {duration}{" "}
               {tr("phút/ô", "minutes/slot")}
             </p>
             <p>
