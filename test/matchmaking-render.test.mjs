@@ -25,6 +25,14 @@ const values = [React, useEffect, useRef, useState, () => { throw new Error('No 
   empty, empty, empty, empty, ...icons.map(() => empty)];
 const Component = new Function(...names, `${code}; return MatchmakingSection;`)(...values);
 
+test('latest fixture join opens the existing detail popup without joining immediately', () => {
+  const requestEffect = original.slice(original.indexOf('if (!requestedMatchId'), original.indexOf('async function create'));
+  assert.match(requestEffect, /setSelectedMatch\(match\)/);
+  assert.match(requestEffect, /onRequestedMatchHandled\(\)/);
+  assert.doesNotMatch(requestEffect, /change\(|performMatchAction\(|\bapi\(/);
+  assert.match(original, /change\(activeMatch, "join"\)/);
+});
+
 test('warm feed renders 24 cards while counts and filters retain all 400 matches', () => {
   const html = renderToStaticMarkup(React.createElement(Component));
   assert.equal((html.match(/<article\b/g) || []).length, 24);

@@ -195,14 +195,15 @@ export default function BookingModal({
   function cell(c, time) {
     const r = slotIntervals[time];
     if (!r) return "locked";
-    if (r.startAt <= clock) return "locked";
     if (availability.some((a) => {
+      if (Number.isFinite(a.endAt) && a.endAt <= clock) return false;
       const active = a.expiresAt
         ? a.expiresAt > clock
         : !["available", "expired", "cancelled"].includes(String(a.status || "").toLowerCase());
       return a.courtId === c.id && active && Number.isFinite(a.startAt) && Number.isFinite(a.endAt) && overlaps(a, r);
     }))
       return "booked";
+    if (r.startAt <= clock) return "locked";
     return "available";
   }
   const selections = useMemo(() => Object.entries(selectedTimes)
@@ -499,14 +500,14 @@ export default function BookingModal({
                               {c.price_day && c.price_night ? (
                                 <>
                                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                    <span>{tr("Sáng (Trước 17:00)", "Day (Before 17:00)")}:</span> 
+                                    <span>{tr("Ngày thường (ngoài cao điểm)", "Weekdays (off-peak)")}:</span>
                                     <span style={{ fontWeight: 'bold' }}>{Number(c.price_day).toLocaleString()} đ/h</span>
                                   </div>
                                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                                    <span>{tr("Tối (Sau 17:00)", "Night (After 17:00)")}:</span> 
+                                    <span>{tr("Cao điểm", "Peak hours")} ({venue.pricing?.peakStart || "17:00"}–{venue.pricing?.peakEnd || "21:00"}):</span>
                                     <span style={{ fontWeight: 'bold' }}>{Number(c.price_night).toLocaleString()} đ/h</span>
                                   </div>
-                                  {c.price_weekend && c.price_weekend !== c.price_night && (
+                                  {c.price_weekend && (
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                       <span>{tr("Cuối tuần", "Weekend")}:</span> 
                                       <span style={{ fontWeight: 'bold' }}>{Number(c.price_weekend).toLocaleString()} đ/h</span>

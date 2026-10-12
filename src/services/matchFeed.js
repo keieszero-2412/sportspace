@@ -20,7 +20,7 @@ export function matchFeedQuery(client, now, legacy = false) {
 
 export function createMatchFeed(client, { now = Date.now, timeoutMs = 8000, ttlMs = 30000, debounceMs = 150, warn = console.warn } = {}) {
   const listeners = new Set();
-  let rows, savedAt = 0, channel, pending, controller, eventTimer;
+  let rows, savedAt = 0, channel, pending, controller, eventTimer, expiryTimer;
   let legacy = false, dirty = false, generation = 0, mutationVersion = 0;
   const read = () => rows === undefined ? undefined : openMatches(rows, now());
   const publish = () => {
@@ -83,6 +83,9 @@ export function createMatchFeed(client, { now = Date.now, timeoutMs = 8000, ttlM
     const listener = { onData, onError };
     listeners.add(listener);
     if (!channel) {
+      // Advance time locally even when there are no database/realtime events.
+      // No polling requests: expired fixtures disappear from all consumers.
+      expiryTimer = setInterval(publish, 30000);
       channel = client.channel(`match-feed:${crypto.randomUUID()}`)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'Matches' }, schedule)
         .subscribe();
@@ -97,6 +100,7 @@ export function createMatchFeed(client, { now = Date.now, timeoutMs = 8000, ttlM
       if (listeners.size) return;
       generation++;
       clearTimeout(eventTimer);
+      clearInterval(expiryTimer);
       controller?.abort('match-feed-stopped');
       pending = undefined;
       controller = undefined;

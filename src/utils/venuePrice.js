@@ -9,6 +9,5 @@ export function venuePriceLabel(venue,lang='vi') {
   const price=publicPriceReference(venue.price_reference);
   if(!price)return venue.price_summary||'';
   const money=value=>`${value.toLocaleString('vi-VN')}đ`;
-  return lang==='en'?`Weekdays ${money(price.min)}, weekends ${money(price.max)}, peak ${money(price.peak)}/h`:
-    `Ngày thường ${money(price.min)}, cuối tuần ${money(price.max)}, cao điểm ${money(price.peak)}/h`;
+  return `${money(price.min)} – ${money(price.max)}/${lang==='en'?'hour':'giờ'}`;
 }

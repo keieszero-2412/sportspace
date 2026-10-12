@@ -190,7 +190,7 @@ export default function MatchmakingSection({
   useEffect(() => {
     if (!requestedMatchId || !userProfile || loading) return;
     const match = matches.find((item) => item.id === requestedMatchId);
-    if (match && !(match.joinedUsers || []).includes(userProfile.uid)) change(match, "join");
+    if (match && !(match.joinedUsers || []).includes(userProfile.uid)) setSelectedMatch(match);
     onRequestedMatchHandled();
   }, [requestedMatchId, userProfile, loading, matches, onRequestedMatchHandled]);
   async function create(e) {
